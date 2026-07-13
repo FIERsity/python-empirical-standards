@@ -6,7 +6,8 @@ model choices are made instead of hiding consequential decisions behind a large 
 
 ## Status
 
-The project is at version 0.2.0. It implements validated OLS, panel fixed effects, classic
+The project is at version 0.3.0. It implements validated data merges and panel diagnostics,
+validated OLS, panel fixed effects, classic
 DID, dynamic event studies, and a transparent first cohort-time ATT estimator for staggered
 adoption. This remains a working foundation, not a complete econometrics library.
 
@@ -72,11 +73,26 @@ did = fit_did(data, "y", "treated", "post", entity="city", time="year",
 See [panel and DID conventions](docs/panel_and_did.md), including current limitations of
 staggered-DID inference.
 
+Validate data structure before estimation:
+
+```python
+from empirical_standards.data import diagnose_panel, merge_validated
+
+merged = merge_validated(panel, attributes, on="city", relationship="many_to_one")
+diagnostics = diagnose_panel(
+    merged.data, entity="city", time="year", variables=["outcome", "treatment"]
+)
+print(diagnostics.summary())
+```
+
+See [data-validation conventions](docs/data_validation.md).
+
 Run the complete example with:
 
 ```bash
 uv run python examples/ols_example.py
 uv run python examples/panel_did_example.py
+uv run python examples/data_validation_example.py
 ```
 
 It writes a tidy CSV to `outputs/ols_clustered.csv`.

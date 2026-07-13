@@ -2,6 +2,13 @@
 
 All notable changes are documented here.
 
+## 0.3.0 - 2026-07-13
+
+- Add cardinality-checked merges with unmatched-key reports.
+- Add panel balance, coverage, singleton, and time-coverage diagnostics.
+- Add within/between variance diagnostics and fixed-effect absorption flags.
+- Add data-validation documentation, example, and tests.
+
 ## 0.2.0 - 2026-07-13
 
 - Add one-way and two-way panel fixed effects with five covariance choices.
