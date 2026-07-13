@@ -1,5 +1,8 @@
 # Output checklist
 
+- Export `plot_data()` for dynamic effects and AR inversion, including support and simultaneous
+  intervals where available. Do not reduce the audit record to an image.
+
 Before presenting an empirical result, retain or report:
 
 - data source, construction date, unit of observation, and exact estimation-sample fingerprint;

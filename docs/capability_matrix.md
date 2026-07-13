@@ -1,53 +1,79 @@
-# Capability matrix
+# V1.0 capability matrix
 
-This matrix distinguishes implemented code from methodological completeness. A passing test
-means the documented numerical behavior is reproducible; it does not validate a research
-design or make a limited estimator equivalent to a full reference implementation.
+This matrix separates stable estimators, design-matched diagnostics, experimental references,
+and verification infrastructure. Passing tests establish reproducible numerical behavior, not a
+valid research design.
 
-## Core
+## Stable estimation APIs
 
-| Area | Implemented | Main boundary |
+| Area | Public implementation | Main boundary |
 |---|---|---|
-| Data structure | Cardinality-checked merges and panel diagnostics | No data versioning or schema registry |
-| OLS | Classical, HC1, one-way cluster covariance | No formula interface or multi-way clustering |
-| Panel FE | Entity, time, and two-way FE; robust and one-/two-way clustering | No general multi-way HDFE estimator |
-| Classic DID | Treated-by-post TWFE with controls | Researcher must justify parallel trends and timing |
-| R staggered DID | `did::att_gt` DR/IPW/regression; group-time/event/cohort/calendar aggregation; support, weights, bootstrap bands, and pretrend output | Requires explicit R environment; identification remains design-specific |
-| R Sun--Abraham | `fixest::sunab` cohort-event, event, cohort, and ATT aggregation; support weights, intervals, and pretrend output | Never-treated reference cohort and declared one-way clustering |
-| Results | Tidy, glance, specification, sample, provenance, CSV/Excel/LaTeX export | Not a publication-table system |
+| Data audit | Schema checks, validated merges, panel diagnostics | No data-version registry |
+| OLS | Classical, HC1, one-way cluster covariance | No formula interface or multi-way cluster |
+| Fixed effects | Entity, time, and two-way panel FE | General multi-dimensional HDFE uses R |
+| Classic DID | Treated-by-post TWFE with explicit controls | Requires a defensible common-timing design |
+| TWFE event study | Dynamic coefficients, joint pretrend test, support and plot-ready data | Not the primary estimator under heterogeneous staggered adoption |
+| Staggered DID | R `did::att_gt` and `aggte`; support, weights, bootstrap bands | Requires the declared R environment |
+| Cohort-interacted event study | R `fixest::sunab`; support and aggregation output | Requires an explicit reference cohort and period |
+| IV/2SLS | Explicit roles, covariance choices, first-stage and specification tests | Identification remains substantive; no LIML/Fuller/JIVE |
+| HDFE panel IV | R `fixest::feols` with explicit roles and fixed effects | R small-sample conventions are recorded, not silently changed |
+| Anderson-Rubin | One endogenous coefficient, robust/cluster test and grid inversion | No multi-endogenous confidence region |
 
-## Advanced, with explicit limits
+## Stable supporting tools
 
-| Area | Implemented | Main boundary |
-|---|---|---|
-| TWFE event study | Dynamic coefficients and joint pre-period test | Can be contaminated under heterogeneous staggered effects |
-| Python cohort-time reference | Unconditional two-period changes using never/not-yet-treated controls | Educational only: balanced panel; no covariate-adjusted or doubly robust score |
-| Python cohort-interaction reference | Never-treated comparison, cohort interactions, weighted aggregation | Educational only; not equivalent to `fixest::sunab` |
-| IV/2SLS | Explicit roles, common covariance options, first-stage and specification diagnostics | Identification remains substantive; no LIML or Fuller estimator |
-| Panel IV | Indicator or within absorption; homoskedastic absorbed-DF option | Robust/cluster absorbed-DF correction is not implemented |
-| Anderson-Rubin | One endogenous coefficient, robust/cluster options, grid inversion | No multi-endogenous AR confidence region |
+- Formal categorical FE interactions and joint equality tests.
+- Covariance sensitivity, declared placebo timing, and leave-one-cluster-out diagnostics.
+- R `fwildclusterboot` null-imposed wild-cluster inference when its optional package is installed.
+- Bonferroni, Holm, and Benjamini-Hochberg adjustment for a declared hypothesis family.
+- First-stage partial and Shea R-squared, excluded-instrument F/Wald tests, conditional relevance
+  checks, and sample-rank validation. Rank summaries are input diagnostics, not weak-ID tests.
+- Standard `tidy`, `glance`, specification, sample, provenance, and long-form `plot_data` outputs.
+  The project prepares plotting data and does not draw figures.
 
-## Supporting diagnostics
+## Experimental compatibility namespace
 
-- Pre-specified FE subgroup fits and categorical interaction tests.
-- Covariance sensitivity and placebo timing.
-- Leave-one-cluster-out, treatment permutation, and null-imposed wild cluster bootstrap under
-  their documented restrictions.
-- Bonferroni, Holm, and Benjamini-Hochberg p-value adjustment.
-- Conditional IV relevance F or Wald tests and sample-rank summaries. These are not formal
-  weak-identification diagnostics.
+Import these only from `empirical_standards.experimental`:
 
-## Not implemented
+- balanced-panel Python cohort-time DID reference;
+- Python cohort-interaction event-study reference;
+- subgroup-by-subgroup FE exploration;
+- unrestricted-assignment DID permutation helper;
+- restricted Python wild-cluster bootstrap reference.
 
-- Kleibergen-Paap rank and weak-identification statistics or critical values.
-- General multi-way high-dimensional fixed effects outside the panel-IV path.
-- LIML, Fuller, JIVE, or weak-identification-robust multi-parameter IV regions.
-- Spatial econometrics, machine-learning validation workflows, data versioning, and a complete
-  publication-table framework.
+They remain available for teaching and reproducibility but are not V1.0 production estimators.
+The public workflow uses R `did`, `fixest`, and `fwildclusterboot` instead.
+
+## Internal verification backends
+
+The Python panel-IV indicator and `pyhdfe` within implementations remain available as transparent
+small-sample and cross-language numerical oracles. Their homoskedastic absorbed-degree correction
+is tested, but they are frozen rather than expanded into a general HDFE inference framework.
+
+Deterministic Python-R benchmarks are verification infrastructure, not separate estimators.
+
+## Deferred
+
+- General Python multi-way HDFE and custom KP implementations.
+- LIML, Fuller, JIVE, and multi-parameter weak-identification-robust regions.
+- Spatial econometrics, machine-learning validation, and data-version management.
+- Figure rendering and a complete publication-table system.
 
 ## Maturity rule
 
-Treat core functions as reusable building blocks. Treat advanced functions as constrained
-reference implementations and verify consequential applications against R. Do not advertise a
-named method without stating the implemented comparison group, covariance convention, sample
-requirement, and missing features.
+Use stable APIs for reusable workflows. Use experimental references only when their narrower
+assumptions are the object of study. Every result must preserve the sample, estimand, treatment or
+instrument roles, fixed effects, comparison group, covariance convention, and backend provenance.
+
+## 中文
+
+V1.0 将功能分为稳定接口、辅助诊断、实验参考和验证基础设施：
+
+- 稳定估计包括 OLS、面板固定效应、经典 DID、TWFE 事件研究、R 交错 DID、R
+  Sun–Abraham、基础 IV/2SLS、R 高维固定效应面板 IV 和单内生变量 AR 检验。
+- 稳定辅助工具包括正式交互异质性、协方差敏感性、安慰剂、LOCO、R wild cluster
+  bootstrap、多重检验校正及明确命名的第一阶段诊断。
+- Python 交错 DID、Python cohort-interaction、分组回归、通用置换和受限 Python wild
+  bootstrap 移至 `empirical_standards.experimental`，仅用于教学和兼容。
+- Python 指示变量与 `pyhdfe` 面板 IV 后端保留作数值核验，不再扩展为通用 HDFE 框架。
+- 项目输出标准化系数、支持度、检验和 `plot_data` 长表，不负责实际绘图。
+- 空间计量、机器学习、数据版本管理和完整论文制表暂缓。

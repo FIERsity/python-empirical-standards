@@ -32,6 +32,10 @@ class AndersonRubinConfidenceSet:
     bounded_below: bool
     bounded_above: bool
 
+    def plot_data(self) -> pd.DataFrame:
+        """Return the full inversion grid for external plotting or auditing."""
+        return self.grid_results.rename(columns={"null_value": "parameter_value"}).copy()
+
 
 def _ar_design(
     data: pd.DataFrame,

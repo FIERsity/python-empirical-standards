@@ -4,8 +4,9 @@ This directory is reserved for version-locked advanced statistical backends. Pyt
 orchestrator and shared result interface. R scripts must follow `docs/backend_policy.md`; do not
 add ad hoc inline R commands or duplicate raw-data cleaning here.
 
-The first backends cover Callaway--Sant'Anna group-time effects (`did`) and Sun--Abraham
-cohort-interacted event studies (`fixest`). Their single authoritative, wheel-distributed scripts
+The backends cover Callaway--Sant'Anna group-time effects (`did`), Sun--Abraham event studies and
+high-dimensional fixed-effects IV (`fixest`), and wild-cluster inference (`fwildclusterboot`).
+Their single authoritative, wheel-distributed scripts
 are under `src/empirical_standards/backends/r_scripts/`, so installed and checkout behavior cannot
 drift apart.
 

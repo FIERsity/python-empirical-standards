@@ -9,7 +9,7 @@ available through explicit, version-locked R backends behind the same Python-fac
 
 ## Status
 
-Version 0.22.0 provides an installable Python package, explicit R causal backends, and a
+Version 1.0.0 provides an installable Python package, explicit R estimator backends, and a
 repository-distributed Agent Skill.
 Capabilities are grouped by maturity rather than presented as equally complete.
 
@@ -20,33 +20,34 @@ Core building blocks:
 - validated OLS with classical, HC1, and one-way clustered covariance;
 - one-way and two-way fixed effects with robust and one-/two-way clustered covariance;
 - classic treated-by-post DID;
-- standardized model tables, plotting data, CSV/Excel/LaTeX exports, and reproducibility
+- standardized model tables, plot-ready data, CSV/Excel/LaTeX exports, and reproducibility
   metadata;
 - the `apply-empirical-standards` Agent Skill for auditable data-to-result workflows;
 - research-grade Callaway--Sant'Anna group-time DID through `did::att_gt`, and Sun--Abraham
   event studies through `fixest::sunab`, including support, aggregation weights, confidence
   intervals, pretrend tests, warnings, provenance, and structured results.
 
-Advanced components with material restrictions:
+Stable advanced components:
 
-- TWFE event studies plus educational Python reference implementations of unconditional
-  balanced-panel cohort-time DID and a never-treated cohort-interacted event study;
-- entity-cluster bootstrap inference and simultaneous bands for the limited staggered-DID path;
-- categorical FE heterogeneity tests, placebo timing, covariance sensitivity,
-  leave-one-cluster-out diagnostics, permutation inference, and restricted wild cluster bootstrap;
+- TWFE event studies with support tables and an explicit staggered-adoption warning boundary;
+- categorical FE interaction tests, placebo timing, covariance sensitivity, and
+  leave-one-cluster-out diagnostics;
+- production wild-cluster bootstrap through the optional R `fwildclusterboot` backend;
 - explicit IV/2SLS with first-stage, Wu-Hausman, Sargan, and robust Wooldridge score tests;
 - multi-endogenous-variable sample-rank and conditional relevance diagnostics;
-- panel IV/2SLS with entity/time fixed effects and single-endogenous-variable Anderson-Rubin
+- high-dimensional fixed-effects panel IV/2SLS through R `fixest`, plus
+  single-endogenous-variable Anderson-Rubin
   weak-identification-robust tests and grid-inverted confidence sets;
-- scalable `pyhdfe` within-transformation for panel-IV structural coefficients, alongside the
-  exact indicator backend, with asymptotic covariance explicitly recorded;
-- opt-in absorbed-degrees finite-sample covariance for homoskedastic within panel IV, verified
-  against both the indicator backend and independent R matrix algebra;
 - Bonferroni, Holm, and Benjamini-Hochberg multiple-testing adjustments;
 - deterministic Python-R numerical benchmarks for fixed effects and 2SLS.
 
-Not implemented: Kleibergen-Paap diagnostics, general multi-way HDFE, spatial econometrics,
-machine-learning validation, data version management, and a complete publication-table framework.
+Educational Python staggered-treatment estimators, subgroup fits, generic treatment permutation,
+and the restricted Python wild bootstrap now live under `empirical_standards.experimental`.
+The indicator and `pyhdfe` panel-IV paths remain internal verification backends rather than the
+recommended complex-FE workflow.
+
+Deferred: a custom general KP implementation, spatial econometrics, machine-learning validation,
+data version management, figure rendering, and a complete publication-table framework.
 See the [capability matrix](docs/capability_matrix.md) for exact boundaries.
 
 This is a working methodological foundation, not a complete econometrics library.
@@ -177,15 +178,15 @@ print(iv.first_stage)
 First-stage statistics retain their actual reference distribution; robust Wald statistics are
 not mislabeled as conventional F statistics. See [the IV/2SLS specification](docs/iv.md).
 
-Panel IV uses the same explicit variable roles and adds entity/time fixed-effect indicators.
+Complex panel IV uses the same explicit variable roles and delegates high-dimensional fixed
+effects and covariance handling to R `fixest` through `fit_panel_iv_2sls_r`.
 Anderson-Rubin tests support controls, fixed effects, robust covariance, and clustering; grid
 inversion retains every accepted value rather than assuming a connected interval. See
 [panel IV and Anderson-Rubin inference](docs/panel_iv_and_ar.md).
 
-Set `absorption="within"` for scalable high-dimensional panel-IV coefficient estimation. The
-default covariance is asymptotic; homoskedastic models may explicitly request the externally
-verified absorbed-DF correction. Robust and clustered absorbed-DF corrections are unavailable.
-Conditional relevance Wald tests are supporting diagnostics, not Kleibergen-Paap statistics.
+The Python indicator and `pyhdfe` within paths remain available for transparent numerical
+verification. Conditional relevance Wald tests and rank summaries retain their literal names and
+are not presented as a custom general KP implementation.
 
 ### Results and exports
 
@@ -252,6 +253,7 @@ src/empirical_standards/  Installable package
   panel/                  Fixed-effects estimation
   causal/                 DID and event-study estimators
   diagnostics/            Heterogeneity, robustness, and resampling inference
+  experimental/           Teaching and compatibility references outside the stable API
   results/                Shared metadata contract
   reporting/              Tables, plotting data, and exports
 tests/                    Numerical, validation, and cross-software tests
@@ -265,9 +267,10 @@ r/                        Optional version-locked advanced statistical backends
 
 ## Roadmap
 
-The next priorities are descriptive-statistics and sample-audit utilities, missingness and
-distribution reports, and a small set of reproducible research visualizations. Spatial and
-machine-learning modules remain later extensions.
+V1.1 will prioritize descriptive-statistics and sample-audit utilities, missingness and
+distribution reports, and broader plot-ready data contracts for event studies, robustness, and
+diagnostics. The project does not render figures. Spatial econometrics, machine-learning
+validation, and complete publication tables remain deferred.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a method. Every estimator must document
 its estimand, assumptions, sample rules, defaults, covariance convention, failure modes,
@@ -287,7 +290,7 @@ MIT
 
 ## 当前状态
 
-当前版本为 0.22.0，产品包括 Python 包、显式 R 因果后端和 Agent Skill。功能按成熟度区分：
+当前版本为 1.0.0，产品包括 Python 包、显式 R 估计后端和 Agent Skill。功能按成熟度区分：
 
 核心功能：
 
@@ -300,19 +303,20 @@ MIT
 - 通过 `did::att_gt` 实现成熟的 Callaway--Sant'Anna 交错 DID；通过 `fixest::sunab`
   实现 Sun--Abraham 事件研究，并输出支持、聚合权重、置信区间、前趋势检验、warnings 和来源信息。
 
-进阶但受限：
+稳定进阶功能：
 
-- TWFE 事件研究；另保留平衡面板 cohort-time DID 和 cohort-interacted 事件研究的 Python 教学参考实现；
-- Python 交错 DID 参考实现的实体 bootstrap 与同时置信带；
-- FE 分类异质性、安慰剂、协方差敏感性、LOCO、置换和受限 wild cluster bootstrap；
+- TWFE 事件研究及事件期样本支持表；
+- 正式 FE 交互异质性、安慰剂、协方差敏感性和 LOCO；
+- 通过可选 R `fwildclusterboot` 提供正式 wild cluster bootstrap；
 - 显式 IV/2SLS，以及第一阶段、Wu-Hausman、Sargan、稳健 Wooldridge score 检验；
 - 多内生变量样本秩与条件相关性辅助诊断；
-- 带个体/时间固定效应的面板 IV/2SLS，以及单内生变量 Anderson-Rubin 弱识别稳健检验和网格反演置信集合；
-- 面板 IV 的 `pyhdfe` 高维 within 后端，并保留精确指示变量后端；within 协方差明确标为渐近；
-- 同方差 within 面板 IV 可显式启用吸收自由度有限样本修正，并已与指示变量后端及 R 矩阵公式核验；
+- 通过 R `fixest` 提供高维固定效应面板 IV/2SLS，并保留单内生变量 AR 检验和网格反演；
 - Bonferroni、Holm、Benjamini-Hochberg 多重检验校正；
 - 固定效应和 2SLS 的确定性 Python-R 数值基准。
-- 尚未实现 KP、通用多维 HDFE、空间计量、机器学习验证、数据版本管理和完整论文制表。准确边界见[功能矩阵](docs/capability_matrix.md)。
+- Python 教学型交错 DID、cohort-interaction、分组回归、通用置换和受限 Python wild
+  bootstrap 已移入 `empirical_standards.experimental`。
+- Python 指示变量与 `pyhdfe` 面板 IV 保留作数值核验，不再作为复杂 FE 的推荐工作流。
+- 空间计量、机器学习、数据版本管理、实际绘图和完整论文制表暂缓。准确边界见[功能矩阵](docs/capability_matrix.md)。
 - `apply-empirical-standards` Agent Skill：规范数据审计、估计器选择、设计匹配的诊断、标准输出和跨软件核验。
 
 这仍是方法基础，不是完整计量经济学库。
@@ -346,8 +350,11 @@ uv build
 - [完整交错处理示例](docs/staggered_did_example.md)会导出支持、权重、推断、warnings、模型设定和来源信息。
 - `merge_validated`、`diagnose_panel`：约束合并关系并检查面板覆盖、重复键、singleton 和 within/between 变异，详见 [数据规范](docs/data_validation.md)。
 - `fit_iv_2sls`：显式区分外生变量、内生变量和排除工具；第一阶段保留真实参考分布，不把稳健 Wald 统计量误称为传统 F，详见 [IV/2SLS 规范](docs/iv.md)。
-- `fit_panel_iv_2sls`、`anderson_rubin_test`：面板 IV 加入个体/时间固定效应；AR 支持控制变量、固定效应、稳健/聚类协方差，网格反演保留全部接受值，不假设置信集合连续，详见 [面板 IV 与 AR 规范](docs/panel_iv_and_ar.md)。
-- 面板 IV 设置 `absorption="within"` 可扩展到高维固定效应；默认使用渐近协方差，同方差模型可显式启用已核验的吸收自由度修正，稳健/聚类修正尚未实现。条件相关性 Wald 只是辅助诊断，不是 KP。
+- `fit_panel_iv_2sls_r`：推荐的高维固定效应面板 IV 后端；`fit_panel_iv_2sls` 的指示变量与
+  `pyhdfe` 路径保留作核验。`anderson_rubin_test` 支持单内生变量、控制、固定效应和
+  稳健/聚类协方差，详见[面板 IV 与 AR 规范](docs/panel_iv_and_ar.md)。
+- `wild_cluster_bootstrap_fe_r`：通过 R `fwildclusterboot` 执行正式 wild cluster 推断；
+  Python 受限版本仅在 `experimental` 中保留。
 - `collect_models`、`export_model_collection`：统一收集并导出模型结果。
 
 所有模型结果都提供 `tidy()`、`glance()`、`model_spec()`、`sample_info()`、`provenance()`；样本元数据包含实际估计数据的确定性指纹。详见 [结果协议](docs/results.md)和[输出规范](docs/reporting.md)。
@@ -382,7 +389,8 @@ Skill 与 Python 包同步版本管理；其中详细方法链接相对于本仓
 
 ## 后续方向
 
-下一步优先补描述统计、样本审计、缺失与分布报告，以及一组可复现的基础研究图形。空间计量和机器学习模块作为后续扩展。
+V1.1 优先完善描述统计、样本审计、缺失与分布报告，并继续统一事件研究、稳健性和
+诊断的绘图前数据协议。项目暂不负责绘图；空间计量、机器学习和完整论文制表继续暂缓。
 
 贡献新方法前请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。每个估计器必须说明估计目标、假设、样本规则、默认值、协方差约定、失败条件、可运行示例、数值测试和外部比较策略。
 

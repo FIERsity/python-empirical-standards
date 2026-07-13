@@ -12,7 +12,7 @@ from empirical_standards.panel.fixed_effects import (
     PanelCovariance,
     fit_fixed_effects,
 )
-from empirical_standards.results import ModelMetadata, build_metadata
+from empirical_standards.results import ModelMetadata, build_metadata, effect_data
 
 
 @dataclass(frozen=True)
@@ -56,6 +56,7 @@ class DIDResult:
 @dataclass(frozen=True)
 class EventStudyResult:
     estimates: pd.DataFrame
+    support: pd.DataFrame
     reference_period: int
     window: tuple[int, int]
     pretrend_statistic: float
@@ -65,6 +66,19 @@ class EventStudyResult:
 
     def tidy(self) -> pd.DataFrame:
         return self.estimates.copy()
+
+    def plot_data(self) -> pd.DataFrame:
+        """Return event-time estimates and sample support without drawing a figure."""
+        table = self.support.merge(self.estimates, on="event_time", how="left")
+        reference = table["is_reference"]
+        table.loc[reference, ["estimate", "conf_low", "conf_high"]] = 0.0
+        table.loc[reference, "term"] = f"reference_{self.reference_period}"
+        return effect_data(
+            table,
+            estimand="twfe_event_time",
+            x="event_time",
+            support_columns=("observations", "entities", "is_reference"),
+        )
 
     def glance(self) -> pd.Series:
         return pd.Series(
@@ -184,6 +198,18 @@ def fit_event_study(
     )
     table = model.tidy().set_index("term").loc[terms].reset_index()
     table.insert(0, "event_time", periods)
+    support_rows: list[dict[str, int | bool]] = []
+    for period in range(lower, upper + 1):
+        selected = sample.loc[relative == period]
+        support_rows.append(
+            {
+                "event_time": period,
+                "observations": len(selected),
+                "entities": int(selected[entity].nunique()),
+                "is_reference": period == reference_period,
+            }
+        )
+    support = pd.DataFrame(support_rows)
     pre_terms = [term for term, period in zip(terms, periods, strict=True) if period < 0]
     if pre_terms:
         restriction = np.zeros((len(pre_terms), len(model.coefficients)))
@@ -210,4 +236,4 @@ def fit_event_study(
         sample=sample[[entity, time, outcome, treatment_time, *terms, *controls]],
         original_nobs=len(data),
     )
-    return EventStudyResult(table, reference_period, window, stat, pvalue, model, metadata)
+    return EventStudyResult(table, support, reference_period, window, stat, pvalue, model, metadata)

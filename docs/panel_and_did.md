@@ -5,10 +5,9 @@
 - `panel.fit_fixed_effects`: one-way entity FE, one-way time FE, or two-way FE.
 - `causal.fit_did`: treated-by-post TWFE DID with optional declared controls.
 - `causal.fit_event_study`: dynamic TWFE event-time coefficients and a joint pre-trend Wald test.
-- `causal.fit_staggered_did`: cohort-time ATT using never-treated or not-yet-treated controls.
 - `causal.fit_staggered_did_r`: research-grade `did::att_gt` group-time ATT.
 - `causal.fit_sun_abraham_r`: research-grade `fixest::sunab` event study.
-- `diagnostics`: pre-specified subgroup estimation, covariance sensitivity, and placebo timing.
+- `diagnostics`: formal interaction heterogeneity, covariance sensitivity, and placebo timing.
 
 ## Fixed effects and inference
 
@@ -30,25 +29,24 @@ observations are represented by missing `treatment_time`.
 TWFE event studies can be contaminated under heterogeneous staggered treatment effects. Use
 them as descriptive diagnostics in that setting, not as a substitute for cohort-time ATT.
 
-`fit_sun_abraham` estimates cohort-by-event-time interactions, omits the declared reference
-period, and aggregates dynamic effects using treated cohort sizes. Its standard errors use
-the full covariance matrix and the delta method. The current implementation requires a
-never-treated comparison group; it does not silently substitute already-treated units.
+`plot_data()` joins TWFE event coefficients to event-time observation counts, entity counts, and
+the omitted-reference marker. It prepares a long table and does not draw a figure.
 
 ## Staggered adoption
 
 For consequential heterogeneous staggered-adoption research, prefer the explicit R APIs above.
 They provide the mature package implementations and never silently fall back. See the
 [strict implementation audit](staggered_did_audit.md). The Python functions described below are
-retained as transparent educational references, not full named-method reproductions.
+retained under `empirical_standards.experimental` as transparent educational references, not full
+named-method reproductions.
 
 Before interpreting an R-backed result, inspect every returned support and aggregation-weight
 table, backend warning, reference rule, and pre-period joint test. Export these components beside
 the coefficient table. Run `examples/staggered_did_r_example.py` for the complete audit pattern.
 
-`fit_staggered_did` compares each treated cohort's outcome change from its last untreated
+`experimental.fit_staggered_did` compares each treated cohort's outcome change from its last untreated
 period with the same change among eligible controls. `not_yet_treated` is the default;
-`never_treated` is available when a stable never-treated group exists. The estimator reports
+`never_treated` is available when a stable never-treated group exists. The reference reports
 group-time, event-time, cohort, calendar-time, and overall ATT. Setting `bootstrap_reps` to at
 least 50 enables entity-cluster bootstrap standard errors, pointwise confidence intervals,
 and max-studentized simultaneous confidence bands. Use substantially more replications
@@ -67,12 +65,12 @@ estimator.
 
 ## Heterogeneity and robustness
 
-Subgroup estimates require a pre-specified, time-invariant entity group and retain the same
-model specification in each subgroup. Differences between subgroup point estimates are not
-automatically evidence that subgroup effects differ; a formal interaction test is still
-needed. `fit_fe_heterogeneity` supplies that test for time-invariant categorical groups by
+`fit_fe_heterogeneity` supplies a formal test for time-invariant categorical groups by
 estimating treatment-by-group interactions, reconstructing group effects from the full
 covariance matrix, and jointly testing all non-reference interactions. Covariance sensitivity
 changes inference, not the estimand. Placebo dates should be
 chosen from genuinely untreated periods and interpreted alongside the event-study pre-trend
 test.
+
+Subgroup-by-subgroup estimation remains available as `experimental.fit_fe_by_group` for
+exploration. Differences in subgroup significance are not evidence that effects differ.

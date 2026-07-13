@@ -13,12 +13,12 @@ REQUIRED_APIS = (
     "fit_fixed_effects",
     "fit_did",
     "fit_event_study",
-    "fit_staggered_did",
-    "fit_sun_abraham",
     "fit_staggered_did_r",
     "fit_sun_abraham_r",
     "fit_iv_2sls",
     "fit_panel_iv_2sls",
+    "fit_panel_iv_2sls_r",
+    "wild_cluster_bootstrap_fe_r",
     "anderson_rubin_test",
     "anderson_rubin_confidence_set",
     "diagnose_iv_relevance",
@@ -74,6 +74,9 @@ def main() -> int:
             if package_version is None
         ]
         print(f"optional R causal backends: unavailable (missing: {', '.join(missing_r)})")
+    wild_environment = check_r_environment(("fwildclusterboot",))
+    status = "available" if wild_environment.available else "unavailable"
+    print(f"optional R wild-cluster backend: {status}")
     return 0
 
 

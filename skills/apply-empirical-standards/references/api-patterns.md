@@ -61,7 +61,7 @@ did = fit_did(
 )
 event = fit_event_study(
     data, "y", "treatment_year",
-    entity="city", time="year", reference=-1,
+    entity="city", time="year", reference_period=-1,
 )
 staggered = fit_staggered_did_r(
     data, "y", treatment_time="treatment_year",
@@ -77,6 +77,8 @@ print(staggered.tidy("support"))
 print(staggered.tidy("aggregation_weights"))
 print(sun_abraham.tidy("cohort_event"))
 print(sun_abraham.glance()[["pretrend_statistic", "pretrend_p_value", "warnings"]])
+print(event.plot_data())
+print(staggered.plot_data())
 ```
 
 Confirm signatures against the installed version. Treatment-cohort encoding, comparison-group
@@ -90,7 +92,7 @@ from empirical_standards import (
     anderson_rubin_test,
     diagnose_iv_relevance,
     fit_iv_2sls,
-    fit_panel_iv_2sls,
+    fit_panel_iv_2sls_r,
     summarize_first_stage,
 )
 
@@ -113,23 +115,23 @@ relevance = diagnose_iv_relevance(
 )
 print(relevance.conditional_tests)
 
-panel_iv = fit_panel_iv_2sls(
+panel_iv = fit_panel_iv_2sls_r(
     data, "y",
     exogenous=["control"], endogenous=["treatment"], instruments=["instrument"],
-    entity="city", time="year", entity_effects=True, time_effects=True,
-    covariance="cluster", absorption="within",
+    fixed_effects=["city", "year"], covariance="cluster", cluster="city",
 )
-# For homoskedastic covariance only, opt into the externally verified absorbed-DF correction:
-# covariance="unadjusted", within_covariance_correction="absorbed_df"
 ar = anderson_rubin_test(
     data, "y", endogenous="treatment", instruments=["instrument"],
-    null=0.0, controls=["control"], entity="city", time="year",
+    null_value=0.0, exogenous=["control"], fixed_effects=["city", "year"],
+    covariance="cluster", cluster="city",
 )
 confidence_set = anderson_rubin_confidence_set(
     data, "y", endogenous="treatment", instruments=["instrument"],
     grid=[-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0],
-    controls=["control"], entity="city", time="year",
+    exogenous=["control"], fixed_effects=["city", "year"],
+    covariance="cluster", cluster="city",
 )
+print(confidence_set.plot_data())
 ```
 
 ## Diagnostics and exports
@@ -140,9 +142,8 @@ from empirical_standards.diagnostics import (
     covariance_sensitivity,
     fit_fe_heterogeneity,
     leave_one_cluster_out_fe,
-    permutation_did,
     placebo_did,
-    wild_cluster_bootstrap_fe,
+    wild_cluster_bootstrap_fe_r,
 )
 from empirical_standards.reporting import collect_models, export_model_collection
 

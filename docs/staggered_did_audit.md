@@ -49,8 +49,9 @@ cohort sizes. It currently requires never-treated units and bins window tails. I
 inspecting the design matrix, but is not a full reproduction of `fixest::sunab` reference cohorts,
 supported-cell weights, coefficient removal, and finite-sample covariance conventions.
 
-The old functions remain available for compatibility and teaching. New empirical work with
-heterogeneous staggered adoption should normally choose the explicit `_r` functions.
+The old functions remain available from `empirical_standards.experimental` for compatibility and
+teaching. New empirical work with heterogeneous staggered adoption should choose the explicit
+`_r` functions.
 
 ## Reproducibility contract
 

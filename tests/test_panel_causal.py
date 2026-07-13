@@ -8,13 +8,15 @@ from empirical_standards import (
     fit_did,
     fit_event_study,
     fit_fixed_effects,
-    fit_staggered_did,
-    fit_sun_abraham,
 )
 from empirical_standards.diagnostics import (
     covariance_sensitivity,
-    fit_fe_by_group,
     fit_fe_heterogeneity,
+)
+from empirical_standards.experimental import (
+    fit_fe_by_group,
+    fit_staggered_did,
+    fit_sun_abraham,
 )
 
 
@@ -81,6 +83,12 @@ def test_event_study_and_pretrend(panel: pd.DataFrame) -> None:
         result.estimates.event_time >= 0, "estimate"
     ].mean() == pytest.approx(2.0, abs=0.15)
     assert 0 <= result.pretrend_p_value <= 1
+    plot_data = result.plot_data()
+    assert {"event_time", "observations", "entities", "is_reference"} <= set(plot_data)
+    assert result.support.loc[result.support["is_reference"], "event_time"].item() == -1
+    reference = plot_data.loc[plot_data["is_reference"]].iloc[0]
+    assert reference["estimate"] == 0
+    assert reference["event_time"] == -1
 
 
 def test_staggered_group_time_att() -> None:

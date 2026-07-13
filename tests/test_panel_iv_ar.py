@@ -8,7 +8,9 @@ from empirical_standards import (
     anderson_rubin_confidence_set,
     anderson_rubin_test,
     fit_panel_iv_2sls,
+    fit_panel_iv_2sls_r,
 )
+from empirical_standards.backends import check_r_environment
 
 
 def make_panel_iv(strength: float = 1.0) -> pd.DataFrame:
@@ -186,6 +188,53 @@ def test_anderson_rubin_grid_inversion() -> None:
     assert any(abs(value - 1.8) <= 0.11 for value in result.accepted_values)
     assert result.lower_bound <= 1.8 <= result.upper_bound
     assert len(result.grid_results) == 26
+    assert list(result.plot_data().columns) == [
+        "parameter_value",
+        "statistic",
+        "p_value",
+        "accepted",
+    ]
+
+
+@pytest.mark.skipif(
+    not check_r_environment(("fixest", "jsonlite")).available,
+    reason="optional R fixest backend is unavailable",
+)
+def test_r_panel_iv_matches_python_within_coefficients() -> None:
+    data = make_panel_iv()
+    python_result = fit_panel_iv_2sls(
+        data,
+        "y",
+        exogenous=["x"],
+        endogenous=["endogenous"],
+        instruments=["z"],
+        entity="id",
+        time="time",
+        covariance="cluster",
+        absorption="within",
+    )
+    r_result = fit_panel_iv_2sls_r(
+        data,
+        "y",
+        exogenous=["x"],
+        endogenous=["endogenous"],
+        instruments=["z"],
+        fixed_effects=["id", "time"],
+        covariance="cluster",
+        cluster="id",
+    )
+    r_coefficients = r_result.tidy().set_index("term")["estimate"].rename(
+        index={"fit_endogenous": "endogenous"}
+    )
+    np.testing.assert_allclose(
+        python_result.iv_result.coefficients.loc[["x", "endogenous"]],
+        r_coefficients.loc[["x", "endogenous"]],
+        rtol=0,
+        atol=1e-10,
+    )
+    assert {"ivf", "ivwald"} <= {
+        metric.split(".", 1)[0] for metric in r_result.first_stage_diagnostics["metric"]
+    }
 
 
 def test_panel_iv_and_ar_validation() -> None:

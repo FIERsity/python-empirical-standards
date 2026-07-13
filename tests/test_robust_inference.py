@@ -4,12 +4,13 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from empirical_standards import wild_cluster_bootstrap_fe_r
+from empirical_standards.backends import check_r_environment
 from empirical_standards.diagnostics import (
     adjust_pvalues,
     leave_one_cluster_out_fe,
-    permutation_did,
-    wild_cluster_bootstrap_fe,
 )
+from empirical_standards.experimental import permutation_did, wild_cluster_bootstrap_fe
 
 
 @pytest.fixture
@@ -77,6 +78,27 @@ def test_permutation_did(inference_panel: pd.DataFrame) -> None:
     assert result.observed_effect == pytest.approx(1.5, abs=0.15)
     assert len(result.null_distribution) == 50
     assert result.permutation_p_value < 0.1
+
+
+@pytest.mark.skipif(
+    not check_r_environment(("fixest", "fwildclusterboot", "jsonlite")).available,
+    reason="optional R wild-cluster backend is unavailable",
+)
+def test_r_wild_cluster_bootstrap_runs(inference_panel: pd.DataFrame) -> None:
+    data = inference_panel.assign(did=inference_panel["treated"] * inference_panel["post"])
+    result = wild_cluster_bootstrap_fe_r(
+        data,
+        "y",
+        ["did", "x"],
+        coefficient="did",
+        fixed_effects=["id", "time"],
+        cluster="region",
+        replications=100,
+        random_state=7,
+    )
+    assert result.estimate == pytest.approx(1.6, abs=0.15)
+    assert result.conf_low < result.estimate < result.conf_high
+    assert result.provenance()["package"] == "fwildclusterboot"
 
 
 def test_leave_one_cluster_out(inference_panel: pd.DataFrame) -> None:

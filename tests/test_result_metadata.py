@@ -8,8 +8,8 @@ from empirical_standards import (
     fit_event_study,
     fit_fixed_effects,
     fit_ols,
-    fit_staggered_did,
 )
+from empirical_standards.experimental import fit_staggered_did
 
 
 def make_panel() -> pd.DataFrame:

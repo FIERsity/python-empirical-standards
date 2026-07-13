@@ -1,43 +1,58 @@
 # Panel IV and Anderson-Rubin inference
 
-`fit_panel_iv_2sls` adds entity and/or time fixed effects to the explicit 2SLS interface. The
-default `absorption="indicators"` backend creates reference-category indicators and includes
-them in both stages. It is algebraically exact and gives transparent finite-sample degrees of
-freedom. `absorption="within"` uses `pyhdfe` to residualize the outcome, exogenous variables,
-endogenous variables, and instruments with the identical high-dimensional projection before
-2SLS. Its structural coefficients are tested against the indicator backend.
+## Recommended panel-IV backend
 
-The scalable within backend deliberately uses asymptotic covariance (`debiased=False`) because
-ordinary regressor-count corrections do not account correctly for absorbed fixed-effect
-degrees. Metadata records this convention and the absorbed degrees. For homoskedastic
-covariance only, `within_covariance_correction="absorbed_df"` scales the covariance using
-residual degrees of freedom equal to observations minus structural parameters minus absorbed
-degrees, and uses the corresponding t reference distribution. It is verified against explicit
-indicators and independent R matrix algebra. Robust and clustered absorbed-DF corrections are
-deliberately unavailable because their finite-sample conventions require separate treatment.
+Use `fit_panel_iv_2sls_r` for IV models with one or more high-dimensional fixed effects. It builds
+a `fixest::feols` IV formula from explicit Python arguments; it does not accept arbitrary formula
+strings. The result contains second-stage coefficients, available `fixest` first-stage and IV
+diagnostics, the generated formula, covariance choice, clustering, fixed effects, package versions,
+and the exact estimation-sample fingerprint.
 
-Panel keys must be complete and unique. Entity clustering is the default when clustered
-covariance is selected without an explicit cluster column. Public coefficient tables hide the
-internal indicator coefficients, while model metadata records the implementation and number
-of absorbed indicators.
+The wrapper accepts `unadjusted`, heteroskedastic-robust, or one-way clustered covariance. It keeps
+the documented `fixest` small-sample defaults and records them. Cross-language comparisons must
+align these conventions before comparing standard errors.
 
-`anderson_rubin_test` tests one endogenous coefficient by subtracting its hypothesized value
-from the outcome and jointly testing the excluded instruments in the resulting reduced-form
-regression. It supports exogenous controls, categorical fixed effects, HC1 covariance, and
-one-way clustering. Unlike the usual 2SLS t-test, its size does not rely on strong first-stage
-identification under the standard AR assumptions.
+## Python verification backends
 
-`anderson_rubin_confidence_set` inverts the test over a user-supplied increasing grid. The full
-accepted grid is retained because weak-identification-robust confidence sets can be
-disconnected or unbounded. `lower_bound` and `upper_bound` are only the envelope of accepted
-grid points; the `bounded_below` and `bounded_above` flags indicate whether the accepted set
-reaches a grid edge. A wider grid and finer spacing are required before reporting endpoints.
+`fit_panel_iv_2sls` remains available for transparent verification:
 
-The current AR implementation covers one endogenous regressor. The package provides sample-rank
-and covariance-explicit conditional relevance diagnostics for multiple endogenous regressors,
-including HC1 and one-way clustering, but Kleibergen-Paap procedures remain future work.
+- `absorption="indicators"` creates exact fixed-effect indicators and is suitable for small data;
+- `absorption="within"` residualizes with `pyhdfe` and defaults to asymptotic covariance;
+- homoskedastic within estimation can opt into `within_covariance_correction="absorbed_df"`.
 
-`summarize_first_stage` distinguishes conventional partial F statistics from robust excluded-
-instrument Wald statistics using the stored reference distribution. It reports Wald divided
-by the number of excluded instruments as a descriptive normalization but sets
-`is_kleibergen_paap=False`; this quantity is not a substitute for the KP rk statistic.
+The indicator and within coefficients are benchmarked against each other and R. This path is
+frozen: robust or clustered absorbed-degree corrections and general multi-way Python HDFE are not
+V1.0 development targets.
+
+## Anderson-Rubin inference
+
+`anderson_rubin_test` tests one structural coefficient by regressing
+`outcome - null_value * endogenous` on the controls, excluded instruments, and explicit fixed-effect
+indicators, then jointly testing the instruments. It supports classical, HC1, or one-way clustered
+covariance.
+
+`anderson_rubin_confidence_set` inverts this test over an explicit increasing grid. The full
+`parameter_value`, statistic, p-value, and acceptance table is available through `plot_data()`.
+Do not assume the accepted set is connected. If accepted values touch a grid boundary, expand the
+grid before interpreting the bounds.
+
+The implementation covers one endogenous coefficient. Multiple-endogenous AR regions, LIML,
+Fuller, and general weak-identification regions are deferred.
+
+## Diagnostic naming
+
+Python conditional first-stage Wald/F tests and matrix-rank summaries retain their literal names.
+They are not relabeled as KP statistics. The R `fixest` backend may return a package-native `kpr`
+diagnostic when it is defined for the fitted specification; the result records the backend and
+metric name rather than claiming a universal custom KP implementation.
+
+## 中文
+
+- 复杂面板 IV 优先使用 `fit_panel_iv_2sls_r`，由明确的变量角色生成 R `fixest` 模型，
+  返回二阶段系数、第一阶段诊断、协方差、固定效应、版本和样本指纹。
+- Python 指示变量与 `pyhdfe` within 后端保留作透明核验；同方差模型仍可启用已验证的
+  吸收自由度修正，但不再扩展稳健/聚类修正或通用 HDFE。
+- AR 检验支持单内生变量、控制变量、显式固定效应及经典/HC1/单向聚类协方差；置信集合
+  保留完整网格，并通过 `plot_data()` 提供绘图前数据。
+- Python 条件第一阶段和秩摘要不称为 KP。R 后端只有在 `fixest` 对具体模型成功返回时才
+  保留原生 `kpr` 指标。

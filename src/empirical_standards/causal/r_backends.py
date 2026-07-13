@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 
 from empirical_standards.backends.r import run_r_backend
-from empirical_standards.results import build_metadata
+from empirical_standards.results import build_metadata, effect_data
 
 RControlGroup = Literal["not_yet_treated", "never_treated"]
 RStaggeredMethod = Literal["dr", "ipw", "reg"]
@@ -49,6 +49,28 @@ class RStaggeredDIDResult:
             "aggregation_weights": self.aggregation_weights,
         }
         return tables[component].copy()
+
+    def plot_data(
+        self, component: Literal["group_time", "event_time"] = "event_time"
+    ) -> pd.DataFrame:
+        """Return effect and support columns for an external plotting tool."""
+        table = self.tidy(component)
+        x = "event_time" if component == "event_time" else "time"
+        return effect_data(
+            table,
+            estimand=f"staggered_{component}",
+            x=x,
+            support_columns=(
+                "cohort",
+                "time",
+                "event_time",
+                "treated_observations",
+                "control_observations",
+                "weight",
+                "simultaneous_conf_low",
+                "simultaneous_conf_high",
+            ),
+        )
 
     def glance(self) -> pd.Series:
         return pd.Series(self.metadata)
@@ -89,6 +111,15 @@ class RSunAbrahamResult:
             "support": self.support,
         }
         return tables[component].copy()
+
+    def plot_data(self) -> pd.DataFrame:
+        """Return aggregated event-time effects for an external plotting tool."""
+        return effect_data(
+            self.event_time_effects,
+            estimand="sun_abraham_event_time",
+            x="event_time",
+            support_columns=("aggregation_weight", "observations", "entities"),
+        )
 
     def glance(self) -> pd.Series:
         return pd.Series(self.metadata)

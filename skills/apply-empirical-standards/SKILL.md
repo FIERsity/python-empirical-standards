@@ -1,6 +1,6 @@
 ---
 name: apply-empirical-standards
-description: Apply the empirical-research-standards project to auditable empirical workflows with Python APIs and declared R estimator backends. Use when an agent needs to inspect research data, validate merges or panel structure, choose among OLS, fixed effects, DID, event-study, staggered-treatment, or IV methods, run design-matched diagnostics, export reproducible results, or verify estimates across languages.
+description: Apply empirical-research-standards V1.x to auditable research workflows with stable Python APIs and declared R estimator backends. Use when an agent needs to audit data, validate merges or panels, choose OLS, fixed effects, DID, event-study, staggered-treatment, or IV methods, run design-matched diagnostics, prepare plot-ready data, export reproducible results, or verify estimates across Python and R.
 ---
 
 # Apply Empirical Standards
@@ -12,6 +12,8 @@ valid.
 Read `docs/backend_policy.md` before developing or invoking an advanced estimator. Use the backend
 declared by the selected public API, verify its locked environment, and never substitute a
 statistically different estimator silently.
+Treat `empirical_standards.experimental` as teaching and compatibility code. Do not select it for
+a primary empirical estimate when a stable R-backed API covers the design.
 
 ## Start safely
 
@@ -75,21 +77,25 @@ Do not:
 
 ### 4. Diagnose and challenge the result
 
-Match checks to the design. Use covariance sensitivity, placebo timing, formal heterogeneity
-tests, leave-one-cluster-out, permutation inference, wild cluster bootstrap, multiple-testing
-adjustment, first-stage diagnostics, or Anderson-Rubin inference only where their assumptions
-fit the design. Distinguish specification sensitivity from identification evidence.
+Match checks to the design. Use covariance sensitivity, placebo timing, formal interaction
+heterogeneity, leave-one-cluster-out, R wild-cluster bootstrap, multiple-testing adjustment,
+first-stage diagnostics, or Anderson-Rubin inference only where their assumptions fit the design.
+Treat generic permutation and subgroup-fit helpers as experimental. Distinguish specification
+sensitivity from identification evidence.
 
 For staggered treatment, read `docs/staggered_did_audit.md` and inspect every returned `support`
 and `aggregation_weights` table before interpreting dynamic effects. Retain group-time and
 cohort-event cells, point and simultaneous intervals, comparison-group settings, reference rules,
 pretrend tests, collinear terms, and backend warnings. Do not reduce the audit to one event plot.
 
-### 5. Export an audit trail
+### 5. Export an audit trail and plot-ready data
 
 For every primary model retain `tidy()`, `glance()`, `model_spec()`, `sample_info()`, and
 `provenance()`. Use `collect_models` and `export_model_collection` for standardized exports.
 Follow [references/output-checklist.md](references/output-checklist.md) before reporting a result.
+For event studies, staggered effects, or confidence-set inversion, also retain `plot_data()` and
+the underlying support table. Prepare numerical plotting inputs only; do not create figures unless
+the user explicitly moves that work outside this project's scope.
 
 ### 6. Verify
 

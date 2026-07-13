@@ -63,13 +63,15 @@ package names and versions, executed script, input fingerprint, and output files
 
 ### Current R backends
 
-`fit_staggered_did_r` uses `did`; `fit_sun_abraham_r` uses `fixest`. Both return structured
-estimates, inference, support, weights, warnings, specifications, and version provenance. Their
-locked regression benchmark is stored under `benchmarks/staggered_did/`.
+`fit_staggered_did_r` uses `did`; `fit_sun_abraham_r` and `fit_panel_iv_2sls_r` use `fixest`;
+`wild_cluster_bootstrap_fe_r` uses `fwildclusterboot`. They return structured estimates,
+diagnostics, specifications, and version provenance and fail explicitly when the declared package
+is unavailable.
 
 ## 中文
 
-项目遵循“Python-first，不是 Python-only”。Python 继续负责数据工程、schema、基础计量、统一结果、Agent 编排和未来机器学习，因为环境更普及、语法通用、完整工作流更容易维护。
+Python 负责数据工程、schema、基础计量、统一结果和 Agent 编排；已有成熟参考实现的复杂
+估计和推断由显式 R 后端执行。
 
 当成熟 R 包已经是方法参考实现，或 Python 需要重写复杂 influence function、cohort aggregation、bootstrap、弱识别或有限样本约定时，应立即转向 R，不为保持单一语言而提供缩水实现。若 Python 与参考 R 结果无法依据公开约定解释，也应停止扩展 Python 路径。
 

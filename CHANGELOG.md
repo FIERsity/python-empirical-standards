@@ -2,6 +2,19 @@
 
 All notable changes are documented here.
 
+## 1.0.0 - 2026-07-13
+
+- Define a stable V1.0 API and move constrained Python staggered-treatment, subgroup,
+  permutation, and bootstrap references to `empirical_standards.experimental`.
+- Add a production R `fixest` high-dimensional fixed-effects IV backend with structured
+  coefficients, package-native diagnostics, sample metadata, and a Python-R numerical test.
+- Add an optional R `fwildclusterboot` backend for null-imposed wild-cluster inference.
+- Standardize long-form plot-ready effect data without adding figure-rendering dependencies.
+- Add TWFE event-time support counts and plot-ready outputs for event studies, staggered DID,
+  Sun--Abraham, and Anderson-Rubin grid inversion.
+- Reorganize the capability matrix, method documents, README, and Agent Skill around stable,
+  experimental, and verification layers.
+
 ## 0.22.0 - 2026-07-13
 
 - Complete the R staggered-DID contract with group-time, event, cohort, calendar, overall,
