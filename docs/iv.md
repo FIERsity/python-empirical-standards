@@ -14,8 +14,11 @@ nonstandard clustering.
 
 `diagnose_iv_relevance` adds transparent multi-endogenous-variable diagnostics. For each
 endogenous regressor it tests the excluded instruments after conditioning on exogenous
-regressors and the other endogenous regressors, reporting the homoskedastic conditional F,
-reference degrees of freedom, p-value, and conditional partial R-squared. It also reports the
+regressors and the other endogenous regressors. `covariance="unadjusted"` reports the
+homoskedastic conditional F with its F reference degrees of freedom. `covariance="robust"`
+and `covariance="cluster"` report HC1 or one-way clustered joint Wald statistics with a
+chi-squared reference distribution; clustering requires an explicit column and at least two
+groups. Every option reports conditional partial R-squared. It also reports the
 sample rank of the residualized instrument-endogenous cross moment and normalized singular
 values. These are sample relevance diagnostics: they are not Kleibergen-Paap statistics, do
 not supply weak-instrument critical values, and do not establish instrument exclusion.

@@ -8,7 +8,7 @@ inference choices explicit instead of hiding them behind a large framework.
 
 ## Status
 
-Version 0.13.0 currently provides two core products: the installable Python package and a
+Version 0.14.0 currently provides two core products: the installable Python package and a
 repository-distributed Agent Skill. Together they currently provide:
 
 - cardinality-checked data merges and panel-structure diagnostics;
@@ -19,8 +19,9 @@ repository-distributed Agent Skill. Together they currently provide:
 - formal categorical heterogeneity tests, placebo timing, covariance sensitivity,
   leave-one-cluster-out diagnostics, permutation inference, and wild cluster bootstrap;
 - explicit IV/2SLS with first-stage, Wu-Hausman, Sargan, and robust Wooldridge score tests;
-- multi-endogenous-variable sample-rank diagnostics, conditional first-stage F tests, and
-  conditional partial R-squared without mislabeling them as Kleibergen-Paap statistics;
+- multi-endogenous-variable sample-rank diagnostics, classical conditional first-stage F,
+  HC1/clustered conditional Wald tests, and conditional partial R-squared without mislabeling
+  them as Kleibergen-Paap statistics;
 - panel IV/2SLS with entity/time fixed effects and single-endogenous-variable Anderson-Rubin
   weak-identification-robust tests and grid-inverted confidence sets;
 - scalable `pyhdfe` within-transformation for panel-IV structural coefficients, alongside the
@@ -239,7 +240,7 @@ MIT
 
 ## 当前状态
 
-当前版本为 0.13.0，核心产品包括可安装 Python 包和随仓库发布的 Agent Skill，已实现：
+当前版本为 0.14.0，核心产品包括可安装 Python 包和随仓库发布的 Agent Skill，已实现：
 
 - 带基数关系约束的数据合并与面板结构诊断；
 - OLS，以及经典、HC1、单向聚类协方差；
@@ -248,7 +249,7 @@ MIT
 - 交错 DID 的实体聚类 bootstrap 与同时置信带；
 - 分类异质性正式检验、安慰剂时点、协方差敏感性、LOCO、置换推断、wild cluster bootstrap；
 - 显式 IV/2SLS，以及第一阶段、Wu-Hausman、Sargan、稳健 Wooldridge score 检验；
-- 多内生变量样本秩、条件第一阶段 F 和条件 partial R² 诊断，并明确不将其误称为 Kleibergen-Paap；
+- 多内生变量样本秩、经典条件 F、HC1/聚类条件 Wald 和条件 partial R²，并明确不将其误称为 Kleibergen-Paap；
 - 带个体/时间固定效应的面板 IV/2SLS，以及单内生变量 Anderson-Rubin 弱识别稳健检验和网格反演置信集合；
 - 面板 IV 的 `pyhdfe` 高维 within 后端，并保留精确指示变量后端；within 协方差明确标为渐近；
 - Bonferroni、Holm、Benjamini-Hochberg 多重检验校正；

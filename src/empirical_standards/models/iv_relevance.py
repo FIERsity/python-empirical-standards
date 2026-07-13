@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal
 
 import numpy as np
 import pandas as pd
+import statsmodels.api as sm
 from scipy import stats
+
+IVRelevanceCovariance = Literal["unadjusted", "robust", "cluster"]
 
 
 @dataclass(frozen=True)
@@ -21,6 +25,8 @@ class IVRelevanceDiagnostics:
     endogenous: tuple[str, ...]
     instruments: tuple[str, ...]
     add_intercept: bool
+    covariance: IVRelevanceCovariance
+    cluster: str | None
 
     def summary(self) -> pd.Series:
         return pd.Series(
@@ -30,6 +36,8 @@ class IVRelevanceDiagnostics:
                 "required_rank": self.required_rank,
                 "rank_condition_satisfied": self.rank_condition_satisfied,
                 "minimum_normalized_singular_value": min(self.normalized_singular_values),
+                "covariance": self.covariance,
+                "cluster": self.cluster,
             }
         )
 
@@ -49,13 +57,21 @@ def diagnose_iv_relevance(
     instruments: list[str] | tuple[str, ...],
     add_intercept: bool = True,
     drop_missing: bool = False,
+    covariance: IVRelevanceCovariance = "unadjusted",
+    cluster: str | None = None,
 ) -> IVRelevanceDiagnostics:
-    """Diagnose sample rank and homoskedastic conditional instrument relevance.
+    """Diagnose sample rank and covariance-explicit conditional instrument relevance.
 
     These diagnostics are not Kleibergen-Paap statistics and do not establish instrument
     validity or population identification.
     """
     exog, endog, excluded = tuple(exogenous), tuple(endogenous), tuple(instruments)
+    if covariance not in {"unadjusted", "robust", "cluster"}:
+        raise ValueError("unsupported IV relevance covariance")
+    if covariance == "cluster" and cluster is None:
+        raise ValueError("cluster is required for clustered IV relevance covariance")
+    if covariance != "cluster" and cluster is not None:
+        raise ValueError("cluster may only be set with covariance='cluster'")
     if not endog or not excluded:
         raise ValueError("endogenous and instruments must each contain at least one column")
     columns = (*exog, *endog, *excluded)
@@ -71,16 +87,23 @@ def diagnose_iv_relevance(
     for column in columns:
         if not pd.api.types.is_numeric_dtype(data[column]):
             raise TypeError(f"column {column!r} must be numeric")
-    sample = data.loc[:, list(columns)].copy()
+    required = [*columns]
+    if cluster is not None:
+        if cluster not in data:
+            raise KeyError(f"cluster column {cluster!r} not found")
+        required.append(cluster)
+    sample = data.loc[:, required].copy()
     missing_rows = sample.isna().any(axis=1)
     if missing_rows.any() and not drop_missing:
         raise ValueError("IV relevance columns contain missing values; set drop_missing=True")
     sample = sample.loc[~missing_rows]
-    values = sample.to_numpy(dtype=float)
+    values = sample.loc[:, list(columns)].to_numpy(dtype=float)
     if not np.isfinite(values).all():
         raise ValueError("IV relevance columns must contain only finite values")
 
     nobs = len(sample)
+    if cluster is not None and sample[cluster].nunique() < 2:
+        raise ValueError("clustered IV relevance covariance requires at least two clusters")
     base = sample.loc[:, list(exog)].to_numpy(dtype=float)
     if add_intercept:
         base = np.column_stack([np.ones(nobs), base])
@@ -118,15 +141,41 @@ def diagnose_iv_relevance(
         denominator_df = nobs - full.shape[1]
         if denominator_df <= 0 or rss_full <= 0:
             raise ValueError("insufficient residual degrees of freedom for conditional first stage")
-        statistic = max(0.0, (rss_reduced - rss_full) / q) / (rss_full / denominator_df)
+        partial_r_squared = max(0.0, 1.0 - rss_full / rss_reduced)
+        if covariance == "unadjusted":
+            statistic = max(0.0, (rss_reduced - rss_full) / q) / (rss_full / denominator_df)
+            p_value = float(stats.f.sf(statistic, q, denominator_df))
+            distribution = f"F({q},{denominator_df})"
+            statistic_kind = "conditional_partial_F"
+            conditional_f = statistic
+        else:
+            fit_options: dict[str, object] = {"cov_type": "HC1"}
+            if covariance == "cluster":
+                fit_options = {
+                    "cov_type": "cluster",
+                    "cov_kwds": {"groups": sample[cluster], "use_correction": True},
+                }
+            fitted = sm.OLS(target, full).fit(**fit_options)
+            restriction = np.zeros((q, full.shape[1]))
+            restriction[:, -q:] = np.eye(q)
+            test = fitted.wald_test(restriction, use_f=False, scalar=True)
+            statistic = float(test.statistic)
+            p_value = float(test.pvalue)
+            distribution = f"chi2({q})"
+            statistic_kind = "robust_conditional_Wald"
+            conditional_f = np.nan
         records.append(
             {
                 "endogenous": name,
-                "conditional_partial_r_squared": max(0.0, 1.0 - rss_full / rss_reduced),
-                "conditional_f_statistic": statistic,
+                "conditional_partial_r_squared": partial_r_squared,
+                "conditional_statistic": statistic,
+                "statistic_kind": statistic_kind,
+                "distribution": distribution,
+                "conditional_f_statistic": conditional_f,
                 "numerator_df": q,
                 "denominator_df": denominator_df,
-                "p_value": float(stats.f.sf(statistic, q, denominator_df)),
+                "p_value": p_value,
+                "is_kleibergen_paap": False,
             }
         )
     return IVRelevanceDiagnostics(
@@ -140,4 +189,6 @@ def diagnose_iv_relevance(
         endog,
         excluded,
         add_intercept,
+        covariance,
+        cluster,
     )

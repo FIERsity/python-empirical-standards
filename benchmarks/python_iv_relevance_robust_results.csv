@@ -1,2 +1,2 @@
 endogenous,conditional_partial_r_squared,conditional_statistic,statistic_kind,distribution,conditional_f_statistic,numerator_df,denominator_df,p_value,is_kleibergen_paap
-endogenous,0.818792810572271,1346.52636201198,conditional_partial_F,"F(2,596)",1346.52636201198,2,596,8.63528089962701e-222,False
+endogenous,0.818792810572271,2781.6530705533,robust_conditional_Wald,chi2(2),,2,596,0,False

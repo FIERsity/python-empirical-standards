@@ -24,3 +24,29 @@ write.csv(
   file.path(directory, "r_iv_relevance_results.csv"),
   row.names = FALSE
 )
+
+design <- model.matrix(full)
+residual <- residuals(full)
+n <- nrow(design)
+k <- ncol(design)
+bread <- solve(crossprod(design))
+meat <- crossprod(design, design * as.numeric(residual^2)) * n / (n - k)
+covariance <- bread %*% meat %*% bread
+instrument_indices <- match(c("z1", "z2"), colnames(design))
+instrument_coefficients <- coef(full)[instrument_indices]
+wald <- as.numeric(
+  t(instrument_coefficients) %*%
+    solve(covariance[instrument_indices, instrument_indices]) %*%
+    instrument_coefficients
+)
+robust_output <- data.frame(
+  endogenous = "endogenous",
+  conditional_partial_r_squared = 1 - rss_full / rss_reduced,
+  conditional_statistic = wald,
+  p_value = pchisq(wald, q, lower.tail = FALSE)
+)
+write.csv(
+  robust_output,
+  file.path(directory, "r_iv_relevance_robust_results.csv"),
+  row.names = FALSE
+)

@@ -2,6 +2,12 @@
 
 All notable changes are documented here.
 
+## 0.14.0 - 2026-07-13
+
+- Add HC1 and one-way clustered conditional instrument-relevance Wald tests.
+- Preserve the conventional F reference distribution only for homoskedastic diagnostics.
+- Add an independent base-R HC1 matrix benchmark and explicit non-KP result labels.
+
 ## 0.13.0 - 2026-07-13
 
 - Add transparent sample-rank diagnostics for multiple endogenous variables.

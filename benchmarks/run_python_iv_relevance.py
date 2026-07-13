@@ -16,6 +16,18 @@ def main() -> None:
     result.conditional_tests.to_csv(
         directory / "python_iv_relevance_results.csv", index=False, float_format="%.15g"
     )
+    robust = diagnose_iv_relevance(
+        data,
+        exogenous=["x"],
+        endogenous=["endogenous"],
+        instruments=["z1", "z2"],
+        covariance="robust",
+    )
+    robust.conditional_tests.to_csv(
+        directory / "python_iv_relevance_robust_results.csv",
+        index=False,
+        float_format="%.15g",
+    )
 
 
 if __name__ == "__main__":

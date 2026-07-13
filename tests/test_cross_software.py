@@ -27,6 +27,8 @@ def test_benchmark_status_is_explicit() -> None:
         "R fixest IV",
         "Python IV relevance",
         "R IV relevance",
+        "Python robust IV relevance",
+        "R robust IV relevance",
     }
 
 
@@ -55,4 +57,12 @@ def test_python_r_iv_relevance_benchmark() -> None:
         "denominator_df",
         "p_value",
     ]
+    np.testing.assert_allclose(python[columns], r[columns], rtol=0, atol=1e-10)
+
+
+def test_python_r_robust_iv_relevance_benchmark() -> None:
+    directory = Path(__file__).parents[1] / "benchmarks"
+    python = pd.read_csv(directory / "python_iv_relevance_robust_results.csv")
+    r = pd.read_csv(directory / "r_iv_relevance_robust_results.csv")
+    columns = ["conditional_partial_r_squared", "conditional_statistic", "p_value"]
     np.testing.assert_allclose(python[columns], r[columns], rtol=0, atol=1e-10)

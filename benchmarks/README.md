@@ -11,3 +11,4 @@ hiding them behind a loose tolerance.
 `iv_fixture.csv` similarly verifies the second-stage 2SLS coefficients and homoskedastic
 standard errors produced by Python `linearmodels` and R `fixest`. The same fixture verifies the
 conditional instrument-relevance F test and partial R-squared against nested base-R `lm` fits.
+An HC1 joint-Wald fixture is independently computed with base-R matrix algebra.

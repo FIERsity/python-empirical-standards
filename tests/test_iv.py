@@ -3,6 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 import pytest
+import statsmodels.api as sm
 
 from empirical_standards import diagnose_iv_relevance, fit_iv_2sls, summarize_first_stage
 
@@ -141,6 +142,50 @@ def test_iv_relevance_validation() -> None:
             exogenous=["x"],
             endogenous=["endogenous", "e2"],
             instruments=["z1"],
+        )
+
+
+def test_robust_conditional_relevance_matches_statsmodels_wald() -> None:
+    data = make_iv_data()
+    result = diagnose_iv_relevance(
+        data,
+        exogenous=["x"],
+        endogenous=["endogenous"],
+        instruments=["z1", "z2"],
+        covariance="robust",
+    )
+    design = sm.add_constant(data[["x", "z1", "z2"]])
+    fitted = sm.OLS(data["endogenous"], design).fit(cov_type="HC1")
+    expected = fitted.wald_test("z1 = 0, z2 = 0", use_f=False, scalar=True)
+    row = result.conditional_tests.iloc[0]
+    assert row["conditional_statistic"] == pytest.approx(float(expected.statistic))
+    assert row["p_value"] == pytest.approx(float(expected.pvalue))
+    assert row["statistic_kind"] == "robust_conditional_Wald"
+    assert row["distribution"] == "chi2(2)"
+    assert np.isnan(row["conditional_f_statistic"])
+    assert not bool(row["is_kleibergen_paap"])
+
+
+def test_clustered_conditional_relevance_and_validation() -> None:
+    data = make_iv_data()
+    result = diagnose_iv_relevance(
+        data,
+        exogenous=["x"],
+        endogenous=["endogenous"],
+        instruments=["z1", "z2"],
+        covariance="cluster",
+        cluster="cluster",
+    )
+    assert result.covariance == "cluster"
+    assert result.cluster == "cluster"
+    assert result.conditional_tests.loc[0, "conditional_statistic"] > 100
+    with pytest.raises(ValueError, match="cluster is required"):
+        diagnose_iv_relevance(
+            data,
+            exogenous=["x"],
+            endogenous=["endogenous"],
+            instruments=["z1", "z2"],
+            covariance="cluster",
         )
     with pytest.raises(ValueError, match="rank deficient"):
         diagnose_iv_relevance(

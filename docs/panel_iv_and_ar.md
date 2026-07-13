@@ -30,8 +30,8 @@ grid points; the `bounded_below` and `bounded_above` flags indicate whether the 
 reaches a grid edge. A wider grid and finer spacing are required before reporting endpoints.
 
 The current AR implementation covers one endogenous regressor. The package provides sample-rank
-and homoskedastic conditional relevance diagnostics for multiple endogenous regressors, but
-robust conditional tests and Kleibergen-Paap procedures remain future work.
+and covariance-explicit conditional relevance diagnostics for multiple endogenous regressors,
+including HC1 and one-way clustering, but Kleibergen-Paap procedures remain future work.
 
 `summarize_first_stage` distinguishes conventional partial F statistics from robust excluded-
 instrument Wald statistics using the stored reference distribution. It reports Wald divided

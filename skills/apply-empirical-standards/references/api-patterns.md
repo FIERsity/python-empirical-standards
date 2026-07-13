@@ -95,6 +95,8 @@ relevance = diagnose_iv_relevance(
     exogenous=["control"],
     endogenous=["treatment"],
     instruments=["instrument"],
+    covariance="cluster",
+    cluster="region",
 )
 print(relevance.conditional_tests)
 
@@ -102,7 +104,7 @@ panel_iv = fit_panel_iv_2sls(
     data, "y",
     exogenous=["control"], endogenous=["treatment"], instruments=["instrument"],
     entity="city", time="year", entity_effects=True, time_effects=True,
-    covariance="cluster_entity", absorption="within",
+    covariance="cluster", absorption="within",
 )
 ar = anderson_rubin_test(
     data, "y", endogenous="treatment", instruments=["instrument"],
