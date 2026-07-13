@@ -4,8 +4,18 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from empirical_standards import fit_did, fit_event_study, fit_fixed_effects, fit_staggered_did
-from empirical_standards.diagnostics import covariance_sensitivity, fit_fe_by_group
+from empirical_standards import (
+    fit_did,
+    fit_event_study,
+    fit_fixed_effects,
+    fit_staggered_did,
+    fit_sun_abraham,
+)
+from empirical_standards.diagnostics import (
+    covariance_sensitivity,
+    fit_fe_by_group,
+    fit_fe_heterogeneity,
+)
 
 
 @pytest.fixture
@@ -146,6 +156,61 @@ def test_staggered_bootstrap_validation() -> None:
         fit_staggered_did(
             data, "y", entity="id", time="time", treatment_time="adoption", bootstrap_reps=20
         )
+
+
+def test_sun_abraham_recovers_weighted_dynamic_effects() -> None:
+    rng = np.random.default_rng(81)
+    ids, periods = 90, 8
+    entity = np.repeat(np.arange(ids), periods)
+    time = np.tile(np.arange(periods), ids)
+    adoption_by_id = np.r_[np.repeat(3.0, 30), np.repeat(5.0, 30), np.repeat(np.nan, 30)]
+    adoption = adoption_by_id[entity]
+    cohort_effect = np.where(adoption == 3, 1.0, np.where(adoption == 5, 3.0, 0.0))
+    treated_now = np.isfinite(adoption) & (time >= adoption)
+    y = (
+        rng.normal(size=ids)[entity]
+        + 0.2 * time
+        + cohort_effect * treated_now
+        + rng.normal(scale=0.12, size=len(entity))
+    )
+    data = pd.DataFrame({"id": entity, "time": time, "adoption": adoption, "y": y})
+    result = fit_sun_abraham(data, "y", "adoption", entity="id", time="time", window=(-2, 2))
+    post = result.event_time_effects.loc[result.event_time_effects.event_time >= 0]
+    assert post["estimate"].mean() == pytest.approx(2.0, abs=0.15)
+    assert result.pretrend_p_value > 0.05
+    assert result.cohort_event_effects["cohort"].nunique() == 2
+
+
+def test_formal_categorical_heterogeneity() -> None:
+    rng = np.random.default_rng(28)
+    ids, periods = 80, 8
+    entity = np.repeat(np.arange(ids), periods)
+    time = np.tile(np.arange(periods), ids)
+    group = np.where(entity < 40, "low", "high")
+    treatment = rng.normal(size=len(entity))
+    slope = np.where(group == "low", 1.0, 2.0)
+    y = (
+        rng.normal(size=ids)[entity]
+        + 0.1 * time
+        + slope * treatment
+        + rng.normal(scale=0.15, size=len(entity))
+    )
+    data = pd.DataFrame(
+        {"id": entity, "time": time, "group": group, "treatment": treatment, "y": y}
+    )
+    result = fit_fe_heterogeneity(
+        data,
+        "y",
+        "treatment",
+        entity="id",
+        time="time",
+        group="group",
+        reference_group="low",
+    )
+    effects = result.group_effects.set_index("group")["estimate"]
+    assert effects["low"] == pytest.approx(1.0, abs=0.08)
+    assert effects["high"] == pytest.approx(2.0, abs=0.08)
+    assert result.joint_p_value < 0.01
 
 
 def test_diagnostics(panel: pd.DataFrame) -> None:

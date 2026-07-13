@@ -2,6 +2,13 @@
 
 All notable changes are documented here.
 
+## 0.6.0 - 2026-07-13
+
+- Add cohort-interacted Sun-Abraham event studies for staggered adoption.
+- Add cohort-size weighted dynamic effects and delta-method standard errors.
+- Add formal categorical fixed-effects heterogeneity estimation and joint Wald tests.
+- Report group-specific treatment effects instead of comparing subgroup significance.
+
 ## 0.5.0 - 2026-07-13
 
 - Add cohort, calendar-time, event-time, and overall staggered-DID aggregation.

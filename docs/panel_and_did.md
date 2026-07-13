@@ -28,6 +28,11 @@ observations are represented by missing `treatment_time`.
 TWFE event studies can be contaminated under heterogeneous staggered treatment effects. Use
 them as descriptive diagnostics in that setting, not as a substitute for cohort-time ATT.
 
+`fit_sun_abraham` estimates cohort-by-event-time interactions, omits the declared reference
+period, and aggregates dynamic effects using treated cohort sizes. Its standard errors use
+the full covariance matrix and the delta method. The current implementation requires a
+never-treated comparison group; it does not silently substitute already-treated units.
+
 ## Staggered adoption
 
 `fit_staggered_did` compares each treated cohort's outcome change from its last untreated
@@ -54,6 +59,9 @@ estimator.
 Subgroup estimates require a pre-specified, time-invariant entity group and retain the same
 model specification in each subgroup. Differences between subgroup point estimates are not
 automatically evidence that subgroup effects differ; a formal interaction test is still
-needed. Covariance sensitivity changes inference, not the estimand. Placebo dates should be
+needed. `fit_fe_heterogeneity` supplies that test for time-invariant categorical groups by
+estimating treatment-by-group interactions, reconstructing group effects from the full
+covariance matrix, and jointly testing all non-reference interactions. Covariance sensitivity
+changes inference, not the estimand. Placebo dates should be
 chosen from genuinely untreated periods and interpreted alongside the event-study pre-trend
 test.
