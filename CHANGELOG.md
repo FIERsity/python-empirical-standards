@@ -2,6 +2,13 @@
 
 All notable changes are documented here.
 
+## 0.10.0 - 2026-07-13
+
+- Add panel 2SLS with entity and/or time fixed-effect indicators.
+- Add clustered panel-IV inference with entity clustering as the explicit default.
+- Add Anderson-Rubin tests with controls, fixed effects, robust covariance, and clustering.
+- Add grid-inverted Anderson-Rubin confidence sets that preserve disconnected acceptance sets.
+
 ## 0.9.0 - 2026-07-13
 
 - Add validated 2SLS with explicit exogenous, endogenous, and instrument roles.

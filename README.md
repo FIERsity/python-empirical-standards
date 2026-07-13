@@ -8,7 +8,7 @@ inference choices explicit instead of hiding them behind a large framework.
 
 ## Status
 
-Version 0.9.0 currently provides:
+Version 0.10.0 currently provides:
 
 - cardinality-checked data merges and panel-structure diagnostics;
 - validated OLS with classical, HC1, and one-way clustered covariance;
@@ -18,6 +18,8 @@ Version 0.9.0 currently provides:
 - formal categorical heterogeneity tests, placebo timing, covariance sensitivity,
   leave-one-cluster-out diagnostics, permutation inference, and wild cluster bootstrap;
 - explicit IV/2SLS with first-stage, Wu-Hausman, Sargan, and robust Wooldridge score tests;
+- panel IV/2SLS with entity/time fixed effects and single-endogenous-variable Anderson-Rubin
+  weak-identification-robust tests and grid-inverted confidence sets;
 - Bonferroni, Holm, and Benjamini-Hochberg multiple-testing adjustments;
 - standardized model tables, plotting data, CSV/Excel/LaTeX exports, and reproducibility
   metadata;
@@ -129,6 +131,11 @@ print(iv.first_stage)
 First-stage statistics retain their actual reference distribution; robust Wald statistics are
 not mislabeled as conventional F statistics. See [the IV/2SLS specification](docs/iv.md).
 
+Panel IV uses the same explicit variable roles and adds entity/time fixed-effect indicators.
+Anderson-Rubin tests support controls, fixed effects, robust covariance, and clustering; grid
+inversion retains every accepted value rather than assuming a connected interval. See
+[panel IV and Anderson-Rubin inference](docs/panel_iv_and_ar.md).
+
 ### Results and exports
 
 Every model result provides `tidy()`, `glance()`, `model_spec()`, `sample_info()`, and
@@ -178,9 +185,9 @@ docs/                     Method specifications and limitations
 
 ## Roadmap
 
-The next methodological priorities are panel IV with absorbed fixed effects, weak-identification
-robust inference such as Anderson-Rubin procedures, richer multi-endogenous-variable
-diagnostics, and IV-specific sensitivity and heterogeneity tools. Spatial econometrics,
+The next methodological priorities are scalable high-dimensional absorbed panel IV,
+Kleibergen-Paap and richer multi-endogenous-variable diagnostics, and IV-specific sensitivity
+and heterogeneity tools. Spatial econometrics,
 machine-learning validation, and additional reporting formats should follow only after those
 core inference paths and external benchmarks are stable.
 
@@ -200,7 +207,7 @@ MIT
 
 ## 当前状态
 
-当前版本为 0.9.0，已实现：
+当前版本为 0.10.0，已实现：
 
 - 带基数关系约束的数据合并与面板结构诊断；
 - OLS，以及经典、HC1、单向聚类协方差；
@@ -209,6 +216,7 @@ MIT
 - 交错 DID 的实体聚类 bootstrap 与同时置信带；
 - 分类异质性正式检验、安慰剂时点、协方差敏感性、LOCO、置换推断、wild cluster bootstrap；
 - 显式 IV/2SLS，以及第一阶段、Wu-Hausman、Sargan、稳健 Wooldridge score 检验；
+- 带个体/时间固定效应的面板 IV/2SLS，以及单内生变量 Anderson-Rubin 弱识别稳健检验和网格反演置信集合；
 - Bonferroni、Holm、Benjamini-Hochberg 多重检验校正；
 - 标准模型表、绘图数据、CSV/Excel/LaTeX 导出与可复现元数据；
 - 固定效应和 2SLS 的确定性 Python-R 数值基准。
@@ -241,6 +249,7 @@ uv build
 - `fit_fixed_effects`、`fit_did`：固定效应和经典 DID；因果模块还包括 TWFE 动态效应、带实体聚类 bootstrap 的 cohort-time ATT、Sun-Abraham，识别与推断限制见 [面板与 DID 规范](docs/panel_and_did.md)。
 - `merge_validated`、`diagnose_panel`：约束合并关系并检查面板覆盖、重复键、singleton 和 within/between 变异，详见 [数据规范](docs/data_validation.md)。
 - `fit_iv_2sls`：显式区分外生变量、内生变量和排除工具；第一阶段保留真实参考分布，不把稳健 Wald 统计量误称为传统 F，详见 [IV/2SLS 规范](docs/iv.md)。
+- `fit_panel_iv_2sls`、`anderson_rubin_test`：面板 IV 加入个体/时间固定效应；AR 支持控制变量、固定效应、稳健/聚类协方差，网格反演保留全部接受值，不假设置信集合连续，详见 [面板 IV 与 AR 规范](docs/panel_iv_and_ar.md)。
 - `collect_models`、`export_model_collection`：统一收集并导出模型结果。
 
 所有模型结果都提供 `tidy()`、`glance()`、`model_spec()`、`sample_info()`、`provenance()`；样本元数据包含实际估计数据的确定性指纹。详见 [结果协议](docs/results.md)和[输出规范](docs/reporting.md)。
@@ -259,7 +268,7 @@ OLS 示例写入 `outputs/ols_clustered.csv`，其余示例输出确定性模型
 
 ## 后续方向
 
-优先补充吸收固定效应的面板 IV、Anderson-Rubin 等弱识别稳健推断、多内生变量诊断，以及 IV 专用异质性和敏感性工具。空间计量、机器学习验证和更多输出格式应在核心推断和外部基准稳定后扩展。
+优先补充可扩展的高维吸收式面板 IV、Kleibergen-Paap 和更完整的多内生变量诊断，以及 IV 专用异质性和敏感性工具。空间计量、机器学习验证和更多输出格式应在核心推断和外部基准稳定后扩展。
 
 贡献新方法前请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。每个估计器必须说明估计目标、假设、样本规则、默认值、协方差约定、失败条件、可运行示例、数值测试和外部比较策略。
 
