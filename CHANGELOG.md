@@ -2,6 +2,11 @@
 
 All notable changes are documented here.
 
+## 0.12.1 - 2026-07-13
+
+- Remove the unused third-party benchmark placeholder and its pending validation path.
+- Focus external numerical verification on reproducible Python-R comparisons.
+
 ## 0.12.0 - 2026-07-13
 
 - Add the repository-distributed `apply-empirical-standards` Agent Skill as a core product.
@@ -36,7 +41,7 @@ All notable changes are documented here.
 ## 0.8.0 - 2026-07-13
 
 - Add a deterministic Python-R fixed-effects benchmark with explicit covariance conventions.
-- Add pending Stata reghdfe commands and a machine-readable verification manifest.
+- Add a machine-readable Python-R verification manifest.
 - Add estimator-neutral coefficient, model, specification, sample, and provenance tables.
 - Add CSV, Excel, and LaTeX exports plus normalized event-study plotting data.
 

@@ -8,7 +8,7 @@ inference choices explicit instead of hiding them behind a large framework.
 
 ## Status
 
-Version 0.12.0 currently provides two core products: the installable Python package and a
+Version 0.12.1 currently provides two core products: the installable Python package and a
 repository-distributed Agent Skill. Together they currently provide:
 
 - cardinality-checked data merges and panel-structure diagnostics;
@@ -38,7 +38,7 @@ This is a working methodological foundation, not a complete econometrics library
 - Reproducible environments, deterministic examples, and tested outputs.
 - Independent modules that can be adopted and verified separately.
 - Small additions driven by concrete research workflows.
-- Results that can be cross-checked against Stata, R, or direct library calls.
+- Results that can be cross-checked against R or direct Python library calls.
 - No causal or substantive interpretation without defensible research assumptions.
 
 The project does not choose a causal design for the researcher or replace inspection of source
@@ -160,9 +160,8 @@ export_model_collection(collection, "outputs", prefix="main_results")
 ```
 
 See the [result contract](docs/results.md), [reporting specification](docs/reporting.md), and
-[cross-software benchmarks](benchmarks/README.md). Stata remains explicitly pending because
-it is unavailable in the current verification environment; Python-R fixed-effects and 2SLS
-benchmarks are executed and tested.
+[cross-software benchmarks](benchmarks/README.md). Python-R fixed-effects and 2SLS benchmarks
+are executed and tested.
 
 ## Runnable examples
 
@@ -207,7 +206,7 @@ src/empirical_standards/  Installable package
   results/                Shared metadata contract
   reporting/              Tables, plotting data, and exports
 tests/                    Numerical, validation, and cross-software tests
-benchmarks/               Deterministic Python/R/Stata benchmark assets
+benchmarks/               Deterministic Python-R benchmark assets
 examples/                 Runnable deterministic workflows
 docs/                     Method specifications and limitations
 skills/                   Agent workflows and progressive references
@@ -238,7 +237,7 @@ MIT
 
 ## 当前状态
 
-当前版本为 0.12.0，核心产品包括可安装 Python 包和随仓库发布的 Agent Skill，已实现：
+当前版本为 0.12.1，核心产品包括可安装 Python 包和随仓库发布的 Agent Skill，已实现：
 
 - 带基数关系约束的数据合并与面板结构诊断；
 - OLS，以及经典、HC1、单向聚类协方差；
@@ -259,7 +258,7 @@ MIT
 ## 原则与边界
 
 - 正确性和显式设定优先；环境、示例和输出可复现并经过测试。
-- 模块保持独立，按真实研究需求小步扩展，并支持与 Stata、R 或底层库交叉验证。
+- 模块保持独立，按真实研究需求小步扩展，并支持 Python-R 或 Python 底层库交叉验证。
 - 项目不替研究者选择因果设计，也不替代对源数据、处理分配机制、识别假设和软件约定的审查，不自动解释实质性或因果含义。
 
 ## 安装与验证
@@ -288,7 +287,7 @@ uv build
 
 所有模型结果都提供 `tidy()`、`glance()`、`model_spec()`、`sample_info()`、`provenance()`；样本元数据包含实际估计数据的确定性指纹。详见 [结果协议](docs/results.md)和[输出规范](docs/reporting.md)。
 
-跨软件基准见 [benchmarks](benchmarks/README.md)：Python-R 固定效应与 2SLS 已实际运行并纳入测试；当前环境没有 Stata，因此 Stata 状态明确为 pending。
+跨软件基准见 [benchmarks](benchmarks/README.md)：Python-R 固定效应与 2SLS 已实际运行并纳入测试。
 
 ## 示例与结构
 

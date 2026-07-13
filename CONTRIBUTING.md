@@ -1,7 +1,7 @@
 # Contributing
 
 Keep contributions small and auditable. Before adding an estimator, document its estimand,
-sample rules, defaults, covariance convention, failure modes, and planned Stata/R comparison.
+sample rules, defaults, covariance convention, failure modes, and planned Python-R comparison.
 
 Run the complete local check before opening a pull request:
 

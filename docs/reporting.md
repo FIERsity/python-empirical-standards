@@ -13,5 +13,5 @@ plotting. It intentionally does not impose colors, fonts, labels, or a graphical
 
 The `benchmarks` directory contains a deterministic panel fixture and reproducible Python and
 R scripts. Python and R coefficients and cluster-robust standard errors are compared only
-after aligning their finite-sample covariance conventions. Stata remains marked pending until
-run in a licensed environment; the repository never treats an unexecuted script as validation.
+after aligning their finite-sample covariance conventions. The repository never treats an
+unexecuted comparison script as validation.

@@ -1,6 +1,6 @@
 ---
 name: apply-empirical-standards
-description: Apply the python-empirical-standards package to auditable empirical research workflows. Use when an agent needs to inspect research data, validate merges or panel structure, choose among OLS, fixed effects, DID, event studies, staggered DID, Sun-Abraham, IV, or panel IV, run supported diagnostics and robustness checks, export reproducible results, or prepare Python estimates for comparison with R or Stata.
+description: Apply the python-empirical-standards package to auditable empirical research workflows. Use when an agent needs to inspect research data, validate merges or panel structure, choose among OLS, fixed effects, DID, event studies, staggered DID, Sun-Abraham, IV, or panel IV, run supported diagnostics and robustness checks, export reproducible results, or prepare Python estimates for comparison with R.
 ---
 
 # Apply Empirical Standards
@@ -81,7 +81,7 @@ Follow [references/output-checklist.md](references/output-checklist.md) before r
 ### 6. Verify
 
 Run the relevant tests and deterministic example. For consequential or new specifications,
-compare coefficients and standard errors with direct library calls or R/Stata using identical
+compare coefficients and standard errors with direct Python library calls or R using identical
 samples, fixed effects, covariance conventions, and finite-sample corrections. Label any
 unavailable comparison as pending; never imply it was executed.
 

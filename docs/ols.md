@@ -39,6 +39,5 @@ confidence intervals for a requested confidence level.
 Cross-software comparisons must align the estimation sample, intercept, variable order,
 cluster definition, degrees-of-freedom correction, and confidence level. Cluster-robust
 standard errors can differ between software because finite-sample corrections and degrees of
-freedom are not universal. Record software versions and the exact Stata or R command beside
-any comparison fixture.
-
+freedom are not universal. Record Python and R package versions and the exact commands beside
+every comparison fixture.

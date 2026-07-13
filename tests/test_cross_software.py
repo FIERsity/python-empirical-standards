@@ -18,9 +18,9 @@ def test_benchmark_status_is_explicit() -> None:
     manifest = pd.read_csv(directory / "benchmark_manifest.csv").set_index("software")
     assert manifest.loc["Python", "status"] == "verified"
     assert manifest.loc["R fixest", "status"] == "verified"
-    assert manifest.loc["Stata reghdfe", "status"] == "pending"
     assert manifest.loc["Python IV", "status"] == "verified"
     assert manifest.loc["R fixest IV", "status"] == "verified"
+    assert set(manifest.index) == {"Python", "R fixest", "Python IV", "R fixest IV"}
 
 
 def test_python_fixest_iv_benchmark() -> None:
