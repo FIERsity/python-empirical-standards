@@ -19,6 +19,18 @@ def main() -> None:
     path = Path(__file__).with_name("panel_fixture.csv")
     fixture.to_csv(path, index=False, float_format="%.15g")
 
+    observations = np.arange(600)
+    z1 = np.sin(observations * 0.17)
+    z2 = np.cos(observations * 0.11)
+    control = np.sin(observations * 0.07 + 0.4)
+    structural_error = np.cos(observations * 0.23) + 0.2 * np.sin(observations * 0.31)
+    endogenous = 0.9 * z1 + 0.6 * z2 + 0.4 * control + 0.5 * structural_error
+    iv_outcome = 1.0 + 0.8 * control + 2.0 * endogenous + structural_error
+    iv_fixture = pd.DataFrame(
+        {"y": iv_outcome, "x": control, "endogenous": endogenous, "z1": z1, "z2": z2}
+    )
+    iv_fixture.to_csv(Path(__file__).with_name("iv_fixture.csv"), index=False, float_format="%.15g")
+
 
 if __name__ == "__main__":
     main()

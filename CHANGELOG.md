@@ -2,6 +2,13 @@
 
 All notable changes are documented here.
 
+## 0.9.0 - 2026-07-13
+
+- Add validated 2SLS with explicit exogenous, endogenous, and instrument roles.
+- Add first-stage strength, Wu-Hausman, Sargan, and robust Wooldridge score diagnostics.
+- Add unadjusted, heteroskedasticity-robust, and one-way clustered IV covariance estimators.
+- Add deterministic Python-R fixest 2SLS coefficient and standard-error benchmarks.
+
 ## 0.8.0 - 2026-07-13
 
 - Add a deterministic Python-R fixed-effects benchmark with explicit covariance conventions.

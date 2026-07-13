@@ -19,3 +19,18 @@ def test_benchmark_status_is_explicit() -> None:
     assert manifest.loc["Python", "status"] == "verified"
     assert manifest.loc["R fixest", "status"] == "verified"
     assert manifest.loc["Stata reghdfe", "status"] == "pending"
+    assert manifest.loc["Python IV", "status"] == "verified"
+    assert manifest.loc["R fixest IV", "status"] == "verified"
+
+
+def test_python_fixest_iv_benchmark() -> None:
+    directory = Path(__file__).parents[1] / "benchmarks"
+    python = pd.read_csv(directory / "python_iv_results.csv").set_index("term")
+    fixest = pd.read_csv(directory / "fixest_iv_results.csv").set_index("term")
+    fixest.index = fixest.index.str.replace("fit_", "", regex=False).str.replace(
+        "(Intercept)", "const", regex=False
+    )
+    fixest = fixest.reindex(python.index)
+    assert list(python.index) == list(fixest.index) == ["const", "x", "endogenous"]
+    np.testing.assert_allclose(python["estimate"], fixest["estimate"], rtol=0, atol=1e-10)
+    np.testing.assert_allclose(python["std_error"], fixest["std_error"], rtol=0, atol=1e-8)

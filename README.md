@@ -6,7 +6,7 @@ model choices are made instead of hiding consequential decisions behind a large 
 
 ## Status
 
-The project is at version 0.8.0. It implements validated data merges and panel diagnostics,
+The project is at version 0.9.0. It implements validated data merges and panel diagnostics,
 validated OLS, panel fixed effects, classic
 DID, dynamic event studies, and a transparent first cohort-time ATT estimator for staggered
 adoption. This remains a working foundation, not a complete econometrics library.
@@ -100,6 +100,25 @@ export_model_collection(collection, "outputs", prefix="main_results")
 ```
 
 See [standardized reporting](docs/reporting.md) and the executable [cross-software benchmark](benchmarks/README.md).
+
+Two-stage least squares is explicit about variable roles:
+
+```python
+from empirical_standards import fit_iv_2sls
+
+iv = fit_iv_2sls(
+    data,
+    "outcome",
+    exogenous=["control"],
+    endogenous=["treatment"],
+    instruments=["instrument_1", "instrument_2"],
+    covariance="cluster",
+    cluster="region",
+)
+print(iv.first_stage)
+```
+
+See the [IV/2SLS specification](docs/iv.md).
 
 Run the complete example with:
 

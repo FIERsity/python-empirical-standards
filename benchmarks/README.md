@@ -10,3 +10,5 @@ the exported result has passed the same comparison test. Differences in p-values
 intervals can reflect reference distributions even when coefficients and covariance matrices
 match; those conventions must be compared separately rather than hidden by a loose tolerance.
 
+`iv_fixture.csv` similarly verifies the second-stage 2SLS coefficients and homoskedastic
+standard errors produced by Python `linearmodels` and R `fixest`.
