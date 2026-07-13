@@ -12,3 +12,5 @@ hiding them behind a loose tolerance.
 standard errors produced by Python `linearmodels` and R `fixest`. The same fixture verifies the
 conditional instrument-relevance F test and partial R-squared against nested base-R `lm` fits.
 An HC1 joint-Wald fixture is independently computed with base-R matrix algebra.
+The absorbed panel-IV fixture separately verifies the opt-in homoskedastic degrees-of-freedom
+correction against a base-R fixed-effect projection and 2SLS covariance calculation.

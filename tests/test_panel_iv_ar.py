@@ -83,10 +83,62 @@ def test_scalable_within_absorption_matches_indicator_coefficients() -> None:
     np.testing.assert_allclose(left, right, rtol=0, atol=1e-10)
     assert within.absorbed_indicator_count == 0
     assert within.absorbed_degrees == 57
-    assert (
-        within.model_spec()["settings"]["covariance_correction"]
-        == "asymptotic_after_within_transformation"
+    assert within.model_spec()["settings"]["covariance_correction"] == "asymptotic"
+
+
+def test_within_absorbed_df_covariance_matches_indicator_backend() -> None:
+    data = make_panel_iv()
+    indicators = fit_panel_iv_2sls(
+        data,
+        "y",
+        exogenous=["x"],
+        endogenous=["endogenous"],
+        instruments=["z"],
+        entity="id",
+        time="time",
+        covariance="unadjusted",
+        absorption="indicators",
     )
+    within = fit_panel_iv_2sls(
+        data,
+        "y",
+        exogenous=["x"],
+        endogenous=["endogenous"],
+        instruments=["z"],
+        entity="id",
+        time="time",
+        covariance="unadjusted",
+        absorption="within",
+        within_covariance_correction="absorbed_df",
+    )
+    terms = ["x", "endogenous"]
+    indicator_table = indicators.tidy().set_index("term").loc[terms]
+    within_table = within.tidy().set_index("term").loc[terms]
+    np.testing.assert_allclose(
+        indicator_table[["estimate", "std_error"]],
+        within_table[["estimate", "std_error"]],
+        rtol=0,
+        atol=1e-10,
+    )
+    assert within.absorbed_degrees == 57
+    assert within.glance()["within_covariance_correction"] == "absorbed_df"
+    assert within.model_spec()["settings"]["covariance_correction"] == "absorbed_df"
+
+
+def test_absorbed_df_covariance_scope_is_explicit() -> None:
+    with pytest.raises(ValueError, match="unadjusted"):
+        fit_panel_iv_2sls(
+            make_panel_iv(),
+            "y",
+            exogenous=["x"],
+            endogenous=["endogenous"],
+            instruments=["z"],
+            entity="id",
+            time="time",
+            covariance="robust",
+            absorption="within",
+            within_covariance_correction="absorbed_df",
+        )
 
 
 def test_anderson_rubin_true_and_false_nulls() -> None:

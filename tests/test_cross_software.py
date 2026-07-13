@@ -29,6 +29,8 @@ def test_benchmark_status_is_explicit() -> None:
         "R IV relevance",
         "Python robust IV relevance",
         "R robust IV relevance",
+        "Python absorbed panel IV",
+        "R absorbed panel IV",
     }
 
 
@@ -66,3 +68,16 @@ def test_python_r_robust_iv_relevance_benchmark() -> None:
     r = pd.read_csv(directory / "r_iv_relevance_robust_results.csv")
     columns = ["conditional_partial_r_squared", "conditional_statistic", "p_value"]
     np.testing.assert_allclose(python[columns], r[columns], rtol=0, atol=1e-10)
+
+
+def test_python_r_absorbed_panel_iv_benchmark() -> None:
+    directory = Path(__file__).parents[1] / "benchmarks"
+    python = pd.read_csv(directory / "python_panel_iv_results.csv").set_index("term")
+    r = pd.read_csv(directory / "r_panel_iv_results.csv").set_index("term")
+    terms = ["x", "endogenous"]
+    np.testing.assert_allclose(
+        python.loc[terms, ["estimate", "std_error"]],
+        r.loc[terms, ["estimate", "std_error"]],
+        rtol=0,
+        atol=1e-10,
+    )

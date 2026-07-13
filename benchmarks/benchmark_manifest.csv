@@ -7,3 +7,5 @@ Python IV relevance,verified,0.13.0,"diagnose_iv_relevance(...)",python_iv_relev
 R IV relevance,verified,base lm,"nested lm RSS F test",r_iv_relevance_results.csv,1e-10,1e-10
 Python robust IV relevance,verified,0.14.0,"diagnose_iv_relevance(..., covariance='robust')",python_iv_relevance_robust_results.csv,1e-10,1e-10
 R robust IV relevance,verified,base matrix algebra,"HC1 joint Wald test",r_iv_relevance_robust_results.csv,1e-10,1e-10
+Python absorbed panel IV,verified,0.15.0,"fit_panel_iv_2sls(..., within_covariance_correction='absorbed_df')",python_panel_iv_results.csv,1e-10,1e-10
+R absorbed panel IV,verified,base matrix algebra,"two-way FE projection and homoskedastic 2SLS covariance",r_panel_iv_results.csv,1e-10,1e-10

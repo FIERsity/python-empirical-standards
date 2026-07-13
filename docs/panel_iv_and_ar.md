@@ -9,8 +9,12 @@ endogenous variables, and instruments with the identical high-dimensional projec
 
 The scalable within backend deliberately uses asymptotic covariance (`debiased=False`) because
 ordinary regressor-count corrections do not account correctly for absorbed fixed-effect
-degrees. Metadata records this convention and the absorbed degrees. A future release must
-add and externally benchmark finite-sample corrections before offering them for this backend.
+degrees. Metadata records this convention and the absorbed degrees. For homoskedastic
+covariance only, `within_covariance_correction="absorbed_df"` scales the covariance using
+residual degrees of freedom equal to observations minus structural parameters minus absorbed
+degrees, and uses the corresponding t reference distribution. It is verified against explicit
+indicators and independent R matrix algebra. Robust and clustered absorbed-DF corrections are
+deliberately unavailable because their finite-sample conventions require separate treatment.
 
 Panel keys must be complete and unique. Entity clustering is the default when clustered
 covariance is selected without an explicit cluster column. Public coefficient tables hide the

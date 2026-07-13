@@ -106,6 +106,8 @@ panel_iv = fit_panel_iv_2sls(
     entity="city", time="year", entity_effects=True, time_effects=True,
     covariance="cluster", absorption="within",
 )
+# For homoskedastic covariance only, opt into the externally verified absorbed-DF correction:
+# covariance="unadjusted", within_covariance_correction="absorbed_df"
 ar = anderson_rubin_test(
     data, "y", endogenous="treatment", instruments=["instrument"],
     null=0.0, controls=["control"], entity="city", time="year",

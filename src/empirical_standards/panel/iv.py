@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
 import pyhdfe
+from scipy import stats
 
 from empirical_standards.models.iv import IV2SLSResult, IVCovariance, fit_iv_2sls
 
@@ -24,6 +25,7 @@ class PanelIV2SLSResult:
     absorption_method: Literal["indicators", "within"]
     entities: int
     periods: int
+    within_covariance_correction: Literal["asymptotic", "absorbed_df"]
 
     @property
     def first_stage(self) -> pd.DataFrame:
@@ -45,6 +47,7 @@ class PanelIV2SLSResult:
         result["absorbed_indicator_count"] = self.absorbed_indicator_count
         result["absorbed_degrees"] = self.absorbed_degrees
         result["absorption_method"] = self.absorption_method
+        result["within_covariance_correction"] = self.within_covariance_correction
         return result
 
     def model_spec(self) -> dict[str, Any]:
@@ -64,7 +67,7 @@ class PanelIV2SLSResult:
             "covariance_correction": (
                 "finite_sample_including_indicators"
                 if self.absorption_method == "indicators"
-                else "asymptotic_after_within_transformation"
+                else self.within_covariance_correction
             ),
         }
         return spec
@@ -118,6 +121,7 @@ def fit_panel_iv_2sls(
     cluster: str | None = None,
     drop_missing: bool = False,
     absorption: Literal["indicators", "within"] = "indicators",
+    within_covariance_correction: Literal["asymptotic", "absorbed_df"] = "asymptotic",
 ) -> PanelIV2SLSResult:
     """Fit panel 2SLS using explicit indicators or scalable HDFE residualization."""
     if not entity_effects and not time_effects:
@@ -133,6 +137,12 @@ def fit_panel_iv_2sls(
         raise ValueError("panel IV requires at least two entities and two periods")
     if absorption not in {"indicators", "within"}:
         raise ValueError("absorption must be 'indicators' or 'within'")
+    if within_covariance_correction not in {"asymptotic", "absorbed_df"}:
+        raise ValueError("unsupported within covariance correction")
+    if absorption != "within" and within_covariance_correction != "asymptotic":
+        raise ValueError("within covariance correction requires absorption='within'")
+    if within_covariance_correction == "absorbed_df" and covariance != "unadjusted":
+        raise ValueError("absorbed_df correction currently supports covariance='unadjusted' only")
     actual_cluster = entity if covariance == "cluster" and cluster is None else cluster
     if absorption == "indicators":
         sample, indicators = _add_fixed_effect_indicators(
@@ -193,6 +203,34 @@ def fit_panel_iv_2sls(
         indicators = ()
         absorbed_indicator_count = 0
         absorbed_degrees = int(algorithm.degrees)
+        if within_covariance_correction == "absorbed_df":
+            structural_parameters = len(exogenous) + len(endogenous)
+            residual_df = result.nobs - structural_parameters - absorbed_degrees
+            if residual_df <= 0:
+                raise ValueError("absorbed fixed effects leave no residual degrees of freedom")
+            scale = result.nobs / residual_df
+            standard_errors = result.standard_errors * np.sqrt(scale)
+            statistic = result.coefficients / standard_errors
+            p_values = pd.Series(
+                2 * stats.t.sf(np.abs(statistic), residual_df),
+                index=statistic.index,
+                name="p_value",
+            )
+            critical = stats.t.ppf(0.975, residual_df)
+            confidence_intervals = pd.DataFrame(
+                {
+                    "conf_low": result.coefficients - critical * standard_errors,
+                    "conf_high": result.coefficients + critical * standard_errors,
+                }
+            )
+            result = replace(
+                result,
+                standard_errors=standard_errors,
+                statistic=statistic.rename("statistic"),
+                p_values=p_values,
+                confidence_intervals=confidence_intervals,
+                debiased=True,
+            )
     # Expose substantive exogenous variables rather than internal indicator columns.
     object.__setattr__(result, "exogenous", tuple(exogenous))
     return PanelIV2SLSResult(
@@ -206,4 +244,5 @@ def fit_panel_iv_2sls(
         absorption,
         int(data[entity].nunique()),
         int(data[time].nunique()),
+        within_covariance_correction,
     )

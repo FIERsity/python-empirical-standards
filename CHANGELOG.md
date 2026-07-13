@@ -2,6 +2,13 @@
 
 All notable changes are documented here.
 
+## 0.15.0 - 2026-07-13
+
+- Add absorbed-fixed-effect degrees-of-freedom correction for homoskedastic within panel IV.
+- Match the scalable within backend to the exact indicator backend for coefficients and
+  standard errors.
+- Add an independent base-R fixed-effect projection and 2SLS covariance benchmark.
+
 ## 0.14.0 - 2026-07-13
 
 - Add HC1 and one-way clustered conditional instrument-relevance Wald tests.
