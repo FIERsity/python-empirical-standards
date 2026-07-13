@@ -2,6 +2,12 @@
 
 All notable changes are documented here.
 
+## 0.18.0 - 2026-07-13
+
+- Add a bilingual design-first model-selection guide with explicit stop conditions.
+- Separate association, fixed-effects, DID, staggered-treatment, and IV decision paths.
+- Align the Agent Skill method map with capability maturity and required R verification.
+
 ## 0.17.0 - 2026-07-13
 
 - Add explicit dataframe schemas for column kinds, nullability, ranges, domains, and unique keys.

@@ -18,7 +18,8 @@ valid.
 3. Preserve source data. Write derived data and outputs to separate, reproducible paths.
 4. Record the outcome, treatment or endogenous variables, controls, identifiers, time variable,
    clusters, instruments, and expected unit of observation before fitting a model.
-5. Read [references/method-selection.md](references/method-selection.md) before choosing an
+5. Read `docs/model_selection.md` and
+   [references/method-selection.md](references/method-selection.md) before choosing an
    estimator. If the user's design is ambiguous, report the ambiguity instead of silently
    selecting a causal estimator.
 6. For a new panel project, use `examples/research_workflow.py` and

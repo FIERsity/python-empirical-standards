@@ -8,7 +8,7 @@ inference choices explicit instead of hiding them behind a large framework.
 
 ## Status
 
-Version 0.17.0 provides an installable Python package and a repository-distributed Agent Skill.
+Version 0.18.0 provides an installable Python package and a repository-distributed Agent Skill.
 Capabilities are grouped by maturity rather than presented as equally complete.
 
 Core building blocks:
@@ -57,6 +57,7 @@ This is a working methodological foundation, not a complete econometrics library
 
 The project does not choose a causal design for the researcher or replace inspection of source
 data, assignment mechanisms, identification assumptions, and software-specific conventions.
+Use the [bilingual model-selection guide](docs/model_selection.md) before choosing an estimator.
 
 ## Install and verify
 
@@ -253,7 +254,7 @@ MIT
 
 ## 当前状态
 
-当前版本为 0.17.0，产品包括 Python 包和 Agent Skill。功能按成熟度区分：
+当前版本为 0.18.0，产品包括 Python 包和 Agent Skill。功能按成熟度区分：
 
 核心功能：
 
@@ -286,6 +287,7 @@ MIT
 - 正确性和显式设定优先；环境、示例和输出可复现并经过测试。
 - 模块保持独立，按真实研究需求小步扩展，并支持 Python-R 或 Python 底层库交叉验证。
 - 项目不替研究者选择因果设计，也不替代对源数据、处理分配机制、识别假设和软件约定的审查，不自动解释实质性或因果含义。
+- 选择估计器前请阅读[中英文模型选择指南](docs/model_selection.md)，其中列出适用条件、最低诊断和停止条件。
 
 ## 安装与验证
 

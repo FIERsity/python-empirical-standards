@@ -1,7 +1,8 @@
 # Method selection
 
-Choose from the research design, not from the coefficient or p-value. Read the linked package
-document before fitting the selected model.
+Choose from the research design, not from the coefficient or p-value. Read
+`docs/model_selection.md` for the full decision sequence and stop conditions, then read the
+linked method document before fitting the selected model.
 
 | Research structure | Entry point | Required design checks | Method document |
 |---|---|---|---|
@@ -13,6 +14,10 @@ document before fitting the selected model.
 | Cohort-interacted staggered event study | `fit_sun_abraham` | Cohort support, reference periods, aggregation weights, comparison group | `docs/panel_and_did.md` |
 | Endogenous regressor with excluded instruments | `fit_iv_2sls` | Relevance, exclusion, independence, first stage, overidentification limits | `docs/iv.md` |
 | IV with entity and/or time fixed effects | `fit_panel_iv_2sls` | All IV checks plus within variation, absorbed dimensions, cluster level | `docs/panel_iv_and_ar.md` |
+
+The staggered-DID and cohort-interacted paths are advanced, limited implementations. Require
+external R verification for consequential use; do not present their availability as evidence
+that their identifying assumptions fit the data.
 
 ## Covariance selection
 
