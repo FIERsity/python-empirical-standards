@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from empirical_standards import fit_iv_2sls
+from empirical_standards import fit_iv_2sls, summarize_first_stage
 
 
 def make_iv_data(strength: float = 1.0) -> pd.DataFrame:
@@ -52,6 +52,12 @@ def test_weak_instruments_are_visible() -> None:
     assert (
         weak.first_stage.loc[0, "excluded_instruments_statistic"]
         < strong.first_stage.loc[0, "excluded_instruments_statistic"]
+    )
+    summary = summarize_first_stage(strong)
+    assert summary.loc[0, "statistic_kind"] == "robust_excluded_instrument_Wald"
+    assert not bool(summary.loc[0, "is_kleibergen_paap"])
+    assert summary.loc[0, "wald_per_excluded_instrument"] == pytest.approx(
+        summary.loc[0, "excluded_instruments_statistic"] / 2
     )
 
 

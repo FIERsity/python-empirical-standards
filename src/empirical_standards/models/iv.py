@@ -31,6 +31,7 @@ class IV2SLSResult:
     endogenous: tuple[str, ...]
     instruments: tuple[str, ...]
     add_intercept: bool
+    debiased: bool
     cluster: str | None
     wu_hausman_statistic: float
     wu_hausman_p_value: float
@@ -92,6 +93,7 @@ def fit_iv_2sls(
     covariance: IVCovariance = "robust",
     cluster: str | None = None,
     drop_missing: bool = False,
+    debiased: bool = True,
 ) -> IV2SLSResult:
     """Fit 2SLS with explicit variable roles and covariance settings."""
     exog, endog, excluded = tuple(exogenous), tuple(endogenous), tuple(instruments)
@@ -133,7 +135,7 @@ def fit_iv_2sls(
         x.insert(0, "const", 1.0)
     endogenous_data = sample.loc[:, list(endog)].astype(float)
     instrument_data = sample.loc[:, list(excluded)].astype(float)
-    fit_options: dict[str, Any] = {"debiased": True}
+    fit_options: dict[str, Any] = {"debiased": debiased}
     if covariance == "unadjusted":
         fit_options["cov_type"] = "unadjusted"
     elif covariance == "robust":
@@ -173,6 +175,7 @@ def fit_iv_2sls(
             "covariance": covariance,
             "cluster": cluster,
             "drop_missing": drop_missing,
+            "debiased": debiased,
             "first_stage_statistic_label": "partial F or robust Wald; inspect distribution",
             "robust_overidentification_test": "Wooldridge score",
         },
@@ -195,6 +198,7 @@ def fit_iv_2sls(
         endogenous=endog,
         instruments=excluded,
         add_intercept=add_intercept,
+        debiased=debiased,
         cluster=cluster,
         wu_hausman_statistic=float(wu.stat),
         wu_hausman_p_value=float(wu.pval),

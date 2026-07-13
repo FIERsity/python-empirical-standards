@@ -49,9 +49,43 @@ def test_panel_iv_recovers_effect_and_hides_indicators() -> None:
     assert list(result.tidy()["term"]) == ["const", "x", "endogenous"]
     assert result.absorbed_indicator_count == 56
     assert result.glance()["estimator"] == "panel_iv_2sls"
+    assert result.model_spec()["settings"]["absorption_implementation"] == "indicators"
+
+
+def test_scalable_within_absorption_matches_indicator_coefficients() -> None:
+    data = make_panel_iv()
+    indicators = fit_panel_iv_2sls(
+        data,
+        "y",
+        exogenous=["x"],
+        endogenous=["endogenous"],
+        instruments=["z"],
+        entity="id",
+        time="time",
+        time_effects=True,
+        covariance="robust",
+        absorption="indicators",
+    )
+    within = fit_panel_iv_2sls(
+        data,
+        "y",
+        exogenous=["x"],
+        endogenous=["endogenous"],
+        instruments=["z"],
+        entity="id",
+        time="time",
+        time_effects=True,
+        covariance="robust",
+        absorption="within",
+    )
+    left = indicators.tidy().set_index("term").loc[["x", "endogenous"], "estimate"]
+    right = within.tidy().set_index("term").loc[["x", "endogenous"], "estimate"]
+    np.testing.assert_allclose(left, right, rtol=0, atol=1e-10)
+    assert within.absorbed_indicator_count == 0
+    assert within.absorbed_degrees == 57
     assert (
-        result.model_spec()["settings"]["absorption_implementation"]
-        == "explicit_reference_category_indicators"
+        within.model_spec()["settings"]["covariance_correction"]
+        == "asymptotic_after_within_transformation"
     )
 
 

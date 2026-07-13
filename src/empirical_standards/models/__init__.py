@@ -1,6 +1,7 @@
 """Econometric model implementations."""
 
 from empirical_standards.models.iv import IV2SLSResult, fit_iv_2sls
+from empirical_standards.models.iv_diagnostics import summarize_first_stage
 from empirical_standards.models.iv_inference import (
     AndersonRubinConfidenceSet,
     AndersonRubinResult,
@@ -18,4 +19,5 @@ __all__ = [
     "anderson_rubin_test",
     "fit_iv_2sls",
     "fit_ols",
+    "summarize_first_stage",
 ]

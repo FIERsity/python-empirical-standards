@@ -4,6 +4,7 @@ from empirical_standards.causal.did import DIDResult, EventStudyResult, fit_did,
 from empirical_standards.causal.staggered import StaggeredDIDResult, fit_staggered_did
 from empirical_standards.causal.sun_abraham import SunAbrahamResult, fit_sun_abraham
 from empirical_standards.models.iv import IV2SLSResult, fit_iv_2sls
+from empirical_standards.models.iv_diagnostics import summarize_first_stage
 from empirical_standards.models.iv_inference import (
     AndersonRubinConfidenceSet,
     AndersonRubinResult,
@@ -35,5 +36,6 @@ __all__ = [
     "fit_panel_iv_2sls",
     "fit_staggered_did",
     "fit_sun_abraham",
+    "summarize_first_stage",
 ]
-__version__ = "0.10.0"
+__version__ = "0.11.0"

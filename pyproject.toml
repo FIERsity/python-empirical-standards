@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "empirical-standards"
-version = "0.10.0"
+version = "0.11.0"
 description = "Transparent, reproducible building blocks for empirical research in Python."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -27,6 +27,7 @@ dependencies = [
   "numpy>=1.26",
   "openpyxl>=3.1",
   "pandas>=2.1",
+  "pyhdfe>=0.2",
   "scipy>=1.12",
   "statsmodels>=0.14.2",
 ]
@@ -75,5 +76,5 @@ strict = true
 packages = ["empirical_standards"]
 
 [[tool.mypy.overrides]]
-module = ["statsmodels.*"]
+module = ["pyhdfe", "pyhdfe.*", "statsmodels.*"]
 ignore_missing_imports = true

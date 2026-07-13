@@ -1,11 +1,16 @@
 # Panel IV and Anderson-Rubin inference
 
 `fit_panel_iv_2sls` adds entity and/or time fixed effects to the explicit 2SLS interface. The
-current implementation creates reference-category indicators and includes them in both 2SLS
-stages. This is algebraically exact and gives transparent finite-sample degrees of freedom,
-but it is intentionally not advertised as a high-dimensional implementation. Very large
-fixed-effect sets require a later absorbed-IV covariance implementation and an external
-benchmark before becoming public API.
+default `absorption="indicators"` backend creates reference-category indicators and includes
+them in both stages. It is algebraically exact and gives transparent finite-sample degrees of
+freedom. `absorption="within"` uses `pyhdfe` to residualize the outcome, exogenous variables,
+endogenous variables, and instruments with the identical high-dimensional projection before
+2SLS. Its structural coefficients are tested against the indicator backend.
+
+The scalable within backend deliberately uses asymptotic covariance (`debiased=False`) because
+ordinary regressor-count corrections do not account correctly for absorbed fixed-effect
+degrees. Metadata records this convention and the absorbed degrees. A future release must
+add and externally benchmark finite-sample corrections before offering them for this backend.
 
 Panel keys must be complete and unique. Entity clustering is the default when clustered
 covariance is selected without an explicit cluster column. Public coefficient tables hide the
@@ -27,3 +32,7 @@ reaches a grid edge. A wider grid and finer spacing are required before reportin
 The current AR implementation covers one endogenous regressor. Multi-endogenous-variable
 weak-identification diagnostics and Kleibergen-Paap procedures remain future work.
 
+`summarize_first_stage` distinguishes conventional partial F statistics from robust excluded-
+instrument Wald statistics using the stored reference distribution. It reports Wald divided
+by the number of excluded instruments as a descriptive normalization but sets
+`is_kleibergen_paap=False`; this quantity is not a substitute for the KP rk statistic.

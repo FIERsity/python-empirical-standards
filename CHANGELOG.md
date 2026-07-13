@@ -2,6 +2,14 @@
 
 All notable changes are documented here.
 
+## 0.11.0 - 2026-07-13
+
+- Add scalable pyhdfe within-transformation for high-dimensional panel IV coefficients.
+- Preserve the indicator backend as an exact finite-sample reference implementation.
+- Label within-backend covariance as asymptotic and record absorbed degrees of freedom.
+- Add first-stage summaries that distinguish conventional F from robust Wald statistics and
+  explicitly refuse to label Wald-per-instrument as Kleibergen-Paap.
+
 ## 0.10.0 - 2026-07-13
 
 - Add panel 2SLS with entity and/or time fixed-effect indicators.
