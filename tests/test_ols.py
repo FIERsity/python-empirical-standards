@@ -30,9 +30,7 @@ def test_matches_statsmodels(data: pd.DataFrame, covariance: str) -> None:
         expected = sm.OLS(data["y"], x).fit(cov_type="HC1")
     else:
         kwargs["cluster"] = "group"
-        expected = sm.OLS(data["y"], x).fit(
-            cov_type="cluster", cov_kwds={"groups": data["group"]}
-        )
+        expected = sm.OLS(data["y"], x).fit(cov_type="cluster", cov_kwds={"groups": data["group"]})
     result = fit_ols(data, "y", ["x1", "x2"], **kwargs)  # type: ignore[arg-type]
     np.testing.assert_allclose(result.coefficients, expected.params)
     np.testing.assert_allclose(result.standard_errors, expected.bse)
@@ -49,7 +47,13 @@ def test_no_intercept_and_tidy_output(data: pd.DataFrame) -> None:
     result = fit_ols(data, "y", ["x1", "x2"], add_intercept=False)
     assert list(result.coefficients.index) == ["x1", "x2"]
     assert list(result.tidy().columns) == [
-        "term", "estimate", "std_error", "statistic", "p_value", "conf_low", "conf_high"
+        "term",
+        "estimate",
+        "std_error",
+        "statistic",
+        "p_value",
+        "conf_low",
+        "conf_high",
     ]
     assert list(result.tidy()["term"]) == ["x1", "x2"]
 
@@ -93,4 +97,3 @@ def test_confidence_level_validation(data: pd.DataFrame) -> None:
     result = fit_ols(data, "y", ["x1"])
     with pytest.raises(ValueError, match="confidence_level"):
         result.tidy(1.0)
-

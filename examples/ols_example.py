@@ -22,9 +22,7 @@ def main() -> None:
     data = make_data()
     classical = fit_ols(data, "outcome", ["treatment"])
     hc1 = fit_ols(data, "outcome", ["treatment"], covariance="HC1")
-    clustered = fit_ols(
-        data, "outcome", ["treatment"], covariance="cluster", cluster="group"
-    )
+    clustered = fit_ols(data, "outcome", ["treatment"], covariance="cluster", cluster="group")
     output = Path("outputs")
     output.mkdir(exist_ok=True)
     clustered.tidy().to_csv(output / "ols_clustered.csv", index=False)
@@ -35,4 +33,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

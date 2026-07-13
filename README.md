@@ -6,9 +6,9 @@ model choices are made instead of hiding consequential decisions behind a large 
 
 ## Status
 
-The project is at version 0.1.0. The first implemented component is ordinary least
-squares with classical, HC1, and one-way cluster-robust standard errors. This is a working
-starting point, not a complete econometrics library.
+The project is at version 0.2.0. It implements validated OLS, panel fixed effects, classic
+DID, dynamic event studies, and a transparent first cohort-time ATT estimator for staggered
+adoption. This remains a working foundation, not a complete econometrics library.
 
 ## Principles
 
@@ -58,10 +58,25 @@ print(result.tidy())
 Missing values cause an error by default. Pass `drop_missing=True` to explicitly request
 complete-case estimation. See [the OLS specification](docs/ols.md) for all conventions.
 
+Panel and causal estimators are similarly explicit:
+
+```python
+from empirical_standards import fit_fixed_effects, fit_did
+
+fe = fit_fixed_effects(data, "y", ["x"], entity="city", time="year",
+                       time_effects=True, covariance="cluster_two_way")
+did = fit_did(data, "y", "treated", "post", entity="city", time="year",
+              controls=["x"], covariance="cluster_entity")
+```
+
+See [panel and DID conventions](docs/panel_and_did.md), including current limitations of
+staggered-DID inference.
+
 Run the complete example with:
 
 ```bash
 uv run python examples/ols_example.py
+uv run python examples/panel_did_example.py
 ```
 
 It writes a tidy CSV to `outputs/ols_clustered.csv`.
@@ -79,10 +94,10 @@ docs/                     Method specifications and conventions
 
 ## Roadmap
 
-The next useful addition is panel fixed effects with clearly specified absorbed effects and
-clustered inference, backed by frozen Stata/R comparison data. Later modules may cover data
-validation and lineage, DID and event studies, IV, spatial models, machine-learning
-evaluation, robustness workflows, and standardized tables and figures.
+The next priority is inference for cohort-time ATT (cluster bootstrap or influence-function
+standard errors and simultaneous bands), formal subgroup interaction tests, and frozen
+Stata/R comparison fixtures. Later modules may cover IV, spatial models, data lineage,
+machine-learning evaluation, and standardized tables and figures.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a new estimator. Each method should
 arrive with assumptions, a runnable example, validation failures, numerical tests, and a
@@ -91,4 +106,3 @@ documented external comparison strategy.
 ## License
 
 MIT
-
