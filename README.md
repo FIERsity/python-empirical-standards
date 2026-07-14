@@ -1,5 +1,13 @@
 # Empirical Research Standards
 
+[![Release](https://img.shields.io/github/v/release/FIERsity/empirical-research-standards?sort=semver&label=release)](https://github.com/FIERsity/empirical-research-standards/releases)
+[![License: MIT](https://img.shields.io/github/license/FIERsity/empirical-research-standards)](LICENSE)
+[![CI](https://github.com/FIERsity/empirical-research-standards/actions/workflows/ci.yml/badge.svg)](https://github.com/FIERsity/empirical-research-standards/actions/workflows/ci.yml)
+
+[![Download source](https://img.shields.io/badge/download-v1.0.0_source_archive-2F81F7?logo=github)](https://github.com/FIERsity/empirical-research-standards/archive/refs/tags/v1.0.0.tar.gz)
+[![Install with uv](https://img.shields.io/badge/use-install_with_uv-DE5FE9?logo=uv&logoColor=white)](#install-and-verify)
+[![Agent Skill](https://img.shields.io/badge/use-apply--empirical--standards_skill-111111)](skills/apply-empirical-standards)
+
 English documentation comes first. A concise, detail-equivalent Chinese version follows.
 
 `empirical-research-standards` is a small, transparent, and testable toolkit for empirical
